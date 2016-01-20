@@ -8,6 +8,41 @@ body {
     background-size: 100% 100%;
     min-width: 100%;
     min-height: 100%;
-    margin: 0;
-    padding: 0;
+    margin: 0px;
+    padding: 0px;
+}
+
+.header_title {
+    background-position: center;
+    background-image: url("main.jpg");
+    background-repeat: no-repeat;
+    background-size: 900px 354px;
+    min-width: 940px;
+    min-height: 354px;
+    margin: 0px;
+    padding: 0px;
+}
+
+.main_menu {
+    background-position: center;
+    background-image: url("menu.png");
+    background-repeat: no-repeat;
+    background-size: 940px 69px;
+    min-width: 940px;
+    min-height: 69px;
+    margin: 0px;
+    padding: 0px;
+}
+
+.main_text {
+    text-align: center;
+    background-color: white;
+    min-width: 900px;
+    max-width: 900px;
+    margin-left: 20px;
+    margin-right: 20px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
