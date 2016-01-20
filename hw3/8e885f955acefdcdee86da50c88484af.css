@@ -12,6 +12,23 @@ body {
     padding: 0px;
 }
 
+h3 {
+    margin-top: 0px;
+    margin-bottom: 32px;
+    padding: 0px;
+}
+
+h4 {
+    margin: 0px;
+    padding: 0px;
+}
+
+p {
+    margin-top: 0px;
+    margin-bottom: 16px;
+    padding: 0px;
+}
+
 .header_title {
     background-position: center;
     background-image: url("main.jpg");
@@ -35,7 +52,6 @@ body {
 }
 
 .main_text {
-    text-align: center;
     background-color: white;
     min-width: 900px;
     max-width: 900px;
@@ -45,4 +61,10 @@ body {
     padding-bottom: 0px;
     padding-left: 0px;
     padding-right: 0px;
+    text-align: left;
+}
+
+.footer {
+    padding-top: 16px;
+    text-align: center;
 }
