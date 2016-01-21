@@ -41,7 +41,12 @@ br {
 }
 
 li {
+    float: center;
     display: inline;
+    text-align: center;
+    text-decoration: none;
+    padding: 0px;
+    margin: 0px;
 }
 
 .header_title {
@@ -59,7 +64,7 @@ li {
 .header_text {
     margin: 0px;
     padding: 0px;
-    position: absolute;
+    position: relative;
     text-align: left;
     letter-spacing: -1px;
     top: 220px;
@@ -73,13 +78,23 @@ li {
     background-size: 940px 69px;
     min-width: 940px;
     min-height: 69px;
+    max-height: 69px;
     margin: 0px;
     padding: 0px;
 }
 
 .menu_item {
+    font-size: 1.1em;
     color: black;
+    display: inline-block;
+    text-align: center;
     text-decoration: none;
+    margin-top: 17px;
+    margin-bottom: 0px;
+    padding-left: 50px;
+    padding-right: 20px;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .menu_item:hover {
