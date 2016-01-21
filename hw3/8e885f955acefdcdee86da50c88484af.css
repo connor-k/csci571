@@ -29,6 +29,10 @@ p {
     padding: 0px;
 }
 
+a {
+    color: #e3c712;
+}
+
 .header_title {
     background-position: center;
     background-image: url("main.jpg");
@@ -38,6 +42,14 @@ p {
     min-height: 354px;
     margin: 0px;
     padding: 0px;
+    position: relative;
+}
+
+.header_text {
+    position: absolute;
+    text-align: left;
+    top: 220px;
+    left: 800px;
 }
 
 .main_menu {
