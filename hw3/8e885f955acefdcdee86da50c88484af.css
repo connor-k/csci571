@@ -41,6 +41,10 @@ a {
     color: #e3c712;
     font-style: normal;
     text-decoration: none;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 1.0em;
+    letter-spacing: -0.1px;
+    font-weight: 900;
 }
 
 br {
@@ -93,20 +97,24 @@ li {
 
 .menu_item {
     font-size: 1.1em;
-    color: black;
+    color: #3b3304;;
     display: inline-block;
     text-align: center;
     text-decoration: none;
-    margin-top: 17px;
+    margin-top: 13px;
     margin-bottom: 0px;
-    padding-left: 50px;
-    padding-right: 20px;
+    padding-left: 35px;
+    padding-right: 35px;
     margin-left: 10px;
     margin-right: 10px;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 1.1em;
+    font-weight: 700;
+
 }
 
 .menu_item:hover {
-    color: blue;
+    color: #999900;
 }
 
 .main_text {
