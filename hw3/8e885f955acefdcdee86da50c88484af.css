@@ -32,6 +32,9 @@ p {
     margin-left: 12px;
     margin-right: 12px;
     padding: 0px;
+    font-family: "Times New Roman", Times, serif;
+    font-size: 0.9em;
+    letter-spacing: -0.2px;
 }
 
 a {
