@@ -5,11 +5,11 @@ html {
 
 body {
     background-image: url("background.png");
-    background-size: 100% 378px;
+    background-size: 2px 378px;
     background-color: #faf9ed;
     margin: 0px;
     padding: 0px;
-    background-repeat: no-repeat;
+    background-repeat: repeat-x;
 }
 
 h3 {
@@ -78,8 +78,9 @@ li {
     padding: 0px;
     position: absolute;
     text-align: left;
-    letter-spacing: -1px;
-    max-width: 210px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    max-width: 215px;
     top: 220px;
     left: 850px;
 }
@@ -96,8 +97,10 @@ li {
 
 .subtitle {
     color: #756707;
-    font-size: 1.5em;
-    font-weight: 520;
+    font-size: 1.42em;
+    font-weight: 700;
+    letter-spacing: 0px;
+    line-height: 1.7;
 }
 
 .main_menu {
