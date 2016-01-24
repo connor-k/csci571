@@ -12,29 +12,33 @@ body {
     background-repeat: repeat-x;
 }
 
-h3 {
+h1 {
+    font-size: 1.3em;
     margin-top: 0px;
     margin-bottom: 32px;
     margin-left: 12px;
     padding: 0px;
 }
 
-h4 {
+h2 {
+    font-size: 1.05em;
     margin-top: 0px;
     margin-bottom: 0px;
     margin-left: 12px;
     padding: 0px;
+    line-height: 0.8em;
 }
 
 p {
     margin-top: 0px;
-    margin-bottom: 16px;
+    margin-bottom: 0px;
     margin-left: 12px;
     margin-right: 12px;
     padding: 0px;
     font-family: "Times New Roman", Times, serif;
     font-size: 0.9em;
     letter-spacing: -0.2px;
+    line-height: 1.2em;
 }
 
 a {
@@ -49,7 +53,7 @@ a {
 
 br {
     display: block;
-    margin: -5px 0px;
+    margin: 8px 0px;
 }
 
 li {
@@ -82,6 +86,11 @@ li {
     max-height: 50px;
     padding-top: 220px;
     padding-left: 480px;
+}
+
+.title_br {
+    display: block;
+    margin: -5px 0px;
 }
 
 .title_main_yellowgreen {
@@ -151,7 +160,8 @@ li {
 }
 
 .footer {
-    padding-top: 16px;
+    font-size: 0.8em;
+    padding-top: 32px;
     padding-bottom: 5px;
     text-align: center;
 }
