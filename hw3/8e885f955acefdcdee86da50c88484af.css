@@ -124,6 +124,7 @@ li {
 }
 
 .menu_item {
+    float: center;
     font-size: 1.1em;
     color: #3b3304;
     display: inline-block;
@@ -131,10 +132,10 @@ li {
     text-decoration: none;
     margin-top: 13px;
     margin-bottom: 0px;
-    padding-left: 2px;
-    padding-right: 2px;
-    margin-left: 45px;
-    margin-right: 45px;
+    padding-left: 26px;
+    padding-right: 26px;
+    margin-left: 19px;
+    margin-right: 19px;
     font-family: "Times New Roman", Times, serif;
     font-size: 1.1em;
     font-weight: 700;
