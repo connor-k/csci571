@@ -81,16 +81,16 @@ li {
     padding: 0px;
     text-align: left;
     font-weight: 600;
-    letter-spacing: -0.5px;
-    max-width: 215px;
+    letter-spacing: -0.2px;
+    max-width: 220px;
     max-height: 50px;
-    padding-top: 220px;
+    padding-top: 227px;
     padding-left: 480px;
 }
 
 .title_br {
     display: block;
-    margin: -5px 0px;
+    margin: -2.5px 0px;
 }
 
 .title_main_yellowgreen {
@@ -107,7 +107,7 @@ li {
     color: #756707;
     font-size: 1.42em;
     font-weight: 700;
-    letter-spacing: 0px;
+    letter-spacing: 0.2px;
     line-height: 1.7;
 }
 
@@ -131,10 +131,10 @@ li {
     text-decoration: none;
     margin-top: 13px;
     margin-bottom: 0px;
-    padding-left: 35px;
-    padding-right: 35px;
-    margin-left: 10px;
-    margin-right: 10px;
+    padding-left: 2px;
+    padding-right: 2px;
+    margin-left: 45px;
+    margin-right: 45px;
     font-family: "Times New Roman", Times, serif;
     font-size: 1.1em;
     font-weight: 700;
