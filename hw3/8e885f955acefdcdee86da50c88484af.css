@@ -70,19 +70,18 @@ li {
     min-height: 354px;
     margin: 0px;
     padding: 0px;
-    position: relative;
 }
 
 .header_text {
     margin: 0px;
     padding: 0px;
-    position: absolute;
     text-align: left;
     font-weight: 600;
     letter-spacing: -0.5px;
     max-width: 215px;
-    top: 220px;
-    left: 850px;
+    max-height: 50px;
+    padding-top: 220px;
+    padding-left: 480px;
 }
 
 .title_main_yellowgreen {
