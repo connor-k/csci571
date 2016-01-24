@@ -5,11 +5,11 @@ html {
 
 body {
     background-image: url("background.png");
-    background-size: 100% 100%;
-    min-height: 100%;
+    background-size: 100% 378px;
+    background-color: #faf9ed;
     margin: 0px;
     padding: 0px;
-    background-repeat: repeat;
+    background-repeat: no-repeat;
 }
 
 h3 {
@@ -76,9 +76,10 @@ li {
 .header_text {
     margin: 0px;
     padding: 0px;
-    position: relative;
+    position: absolute;
     text-align: left;
     letter-spacing: -1px;
+    max-width: 210px;
     top: 220px;
     left: 850px;
 }
@@ -113,7 +114,7 @@ li {
 
 .menu_item {
     font-size: 1.1em;
-    color: #3b3304;;
+    color: #3b3304;
     display: inline-block;
     text-align: center;
     text-decoration: none;
@@ -126,7 +127,6 @@ li {
     font-family: "Times New Roman", Times, serif;
     font-size: 1.1em;
     font-weight: 700;
-
 }
 
 .menu_item:hover {
@@ -145,7 +145,7 @@ li {
     padding-bottom: 0px;
     padding-left: 0px;
     padding-right: 0px;
-    text-align: center;
+    text-align: left;
 }
 
 .footer {
