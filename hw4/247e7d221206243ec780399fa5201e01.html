@@ -83,14 +83,15 @@ function viewXML(what)
 </head>
     
 <body>
-<h1>View the Commercial Aircrafts </h1>
-Enter boeing.xml or airbus.xml and click on Submit
-<form name="myform" method="POST" id="location">
-<input type="text" name="URL" maxlength="255" size="100" value="airbus.xml" />
-<br />
-<input type="button" name="submit" value="Submit Query" onClick="viewXML(this.form)" />
-</form>
-
+<div align="center">
+    <p>Enter URL for Company List XML File</p>
+    <form name="myform" method="POST" id="location">
+        <input type="text" name="URL" maxlength="255" size="20" />
+        <br>
+        <br>
+        <input type="button" name="submit" value="Submit Query" onClick="viewXML(this.form)" />
+    </form>
+</div>
 <noscript>
 </body>
 </html>
