@@ -11,11 +11,34 @@ function generateHTML(xmlDoc) {
     var ELEMENT_NODE = 1;
     // TODO looks like they used a lot of globals -- remove them later
     root = xmlDoc.DocumentElement;
+    debug = xmlDoc;
     html_text = "<html><head><title>XML Parse Result</title></head><body>";
     html_text += "<table border='2'>";
-    caption = xmlDoc.getElementsByTagName("title").item(0).firstChild.nodeValue;
-    html_text += "<caption align='left'><h1>" + caption + "</h1></caption>";
-    planes = xmlDoc.getElementsByTagName("aircraft");
+    table = xmlDoc.getElementsByTagName("Table").item(0).children;
+    // Check that there's data
+    if (table.length < 2) {
+        throw("Error in XML file: Missing tags."); //TODO check
+    }
+    // Titles
+    tableTitleSection = table[0];
+    if (tableTitleSection.nodeName != "Header") {
+        throw("Error in XML file: Missing header tag as first element.");
+    }
+    html_text += "<thead><tr>";
+    tableColTitles = tableTitleSection.children;
+    for (var i = 0; i < tableColTitles.length; i++) {
+        // Check that it's an element node
+        if (tableColTitles[i].nodeName == "Data" && tableColTitles[i].nodeType == ELEMENT_NODE) {
+            var colName = tableColTitles[i].innerHTML;
+            html_text += "<th>" + colName + "</th>";
+            //TODO check if can be empty?
+        } else {
+            throw("Error in XML file: invalid data tag in headers.");
+        }
+    }
+    html_text += "</tr></thead>";
+    html_text += "<tbody>"
+    /*
     planeNodeList = planes.item(0).childNodes;
     html_text += "<tbody>";
     html_text += "<tr>";
@@ -61,7 +84,7 @@ function generateHTML(xmlDoc) {
             }
         }
         html_text += "</tr>";
-    }
+    }*/
     html_text += "</tbody>";
     html_text += "</table>";
     html_text += "</body></html>";
