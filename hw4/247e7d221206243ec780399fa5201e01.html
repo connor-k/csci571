@@ -38,35 +38,38 @@ function generateHTML(xmlDoc) {
     }
     html_text += "</tr></thead>";
     html_text += "<tbody>"
-    /*
-    planeNodeList = planes.item(0).childNodes;
-    html_text += "<tbody>";
-    html_text += "<tr>";
-    var x = 0;
-    var y = 0;
-    // Output the headers
-    for (var i = 0; i < planeNodeList.length; i++) {
-        if (planeNodeList.item(i).nodeType == ELEMENT_NODE) {
-            header = planeNodeList.item(i).nodeName;
-            if (header == "Call Sign") {
-                header = "Call Sign";
-                x = 120;
-                y = 55;
-            } else if (header == "Boeing") {
-                header="Family";
-                x = 100;
-                y = 67;
-            } else if (header == "seats") {
-                header = "Seats";
-            } else if (header == "Wingspan") {
-                header = "Wing Span";
-            } else if (header == "height") {
-                header = "Height";
+    // Rows of data
+    for (var i = 1; i < table.length; i++) {
+        // Check that it's an element node
+        if (table[i].nodeName == "Row" && table[i].nodeType == ELEMENT_NODE) {
+            html_text += "<tr>";
+            rowNode = table[i].children;
+            // TODO check len?
+            for (var j = 0; j < rowNode.length; j++) {
+                html_text += "<td>";
+                // TODO enforce order??
+                // TODO check that matches headers?
+                if (rowNode[j].nodeName == "CallSign" || rowNode[j].nodeName == "Frequency" || rowNode[j].nodeName == "Format") {
+                    html_text += rowNode[j].innerHTML;
+                } else if (rowNode[j].nodeName == "Location") {
+                    
+                } else if (rowNode[j].nodeName == "HomePage") {
+                    // TODO: should links open in a new tab/window? Just default?
+                    html_text += "<a href=" + rowNode[j].innerHTML + ">" + rowNode[j].innerHTML + "</a>";
+                } else if (rowNode[j].nodeName == "Logo") {
+                    
+                } else {
+                    throw("Error in XML file: invalid tag in a table row.");
+                }
+                html_text += "</td>";
             }
-            html_text += "<th>" + header + "</th>";
+            //TODO check if can be empty?
+            html_text += "</tr>";
+        } else {
+            throw("Error in XML file: invalid row tag in table.");
         }
     }
-    html_text += "</tr>";
+    /*
     // Output out the values for all planes
     for (var i = 0; i < planes.length; i++) {
         // Get properties of a plane
