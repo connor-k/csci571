@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <title>ckerns HW4 - XML</title>
 
-<script language="JavaScript">
+<script>
 function generateHTML(xmlDoc) {
     // MS parser doesn't define Node.ELEMENT_NODE
     var ELEMENT_NODE = 1;
@@ -25,8 +25,8 @@ function generateHTML(xmlDoc) {
     for (var i = 0; i < planeNodeList.length; i++) {
         if (planeNodeList.item(i).nodeType == ELEMENT_NODE) {
             header = planeNodeList.item(i).nodeName;
-            if (header == "Airbus") {
-                header = "Family";
+            if (header == "Call Sign") {
+                header = "Call Sign";
                 x = 120;
                 y = 55;
             } else if (header == "Boeing") {
@@ -78,7 +78,11 @@ function viewXML(what) {
             xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
         }
         xmlhttp.open("GET", url, false);
-        xmlhttp.send();
+        try {
+            xmlhttp.send();
+        } catch (e) {
+            alert(e);
+        }
         xmlDoc = xmlhttp.responseXML;
         return xmlDoc;
     }
@@ -87,20 +91,25 @@ function viewXML(what) {
     if (window.ActiveXObject) {
         if (xmlDoc.parseError.errorCode != 0) {
             var myErr = xmlDoc.parseError;
-            generateError(xmlDoc);
+            error("Error in XML file");
             hWin = window.open("", "Error", "height=300,width=340");
             hWin.document.write(html_text);
-        } else {  generateHTML(xmlDoc);
+        } else {
+            generateHTML(xmlDoc);
             hWin = window.open("", "Assignment4", "height=800,width=600");
             hWin.document.write(html_text);
         }
     } else {
         // Else if FF, execute script once XML object has loaded
-        xmlDoc.onload=generateHTML(xmlDoc);
-        hWin = window.open("", "Assignment4", "height=800,width=600");
-        hWin.document.write(html_text);
+        try {
+            xmlDoc.onload = generateHTML(xmlDoc);
+            hWin = window.open("", "Assignment4", "height=800,width=600");
+            hWin.document.write(html_text);
+            hWin.document.close();
+        } catch (e) {
+            alert(e);
+        }
     }
-    hWin.document.close();
 }
 </script>
 </head>
@@ -108,7 +117,7 @@ function viewXML(what) {
 <body>
 <div align="center">
     <p>Enter URL for Company List XML File</p>
-    <form name="myform" method="POST" id="location">
+    <form>
         <input type="text" name="URL" maxlength="255" size="20" />
         <br><br>
         <input type="button" name="submit" value="Submit Query" onClick="viewXML(this.form)" />
