@@ -52,7 +52,14 @@ function generateHTML(xmlDoc) {
                 if (rowNode[j].nodeName == "CallSign" || rowNode[j].nodeName == "Frequency" || rowNode[j].nodeName == "Format") {
                     html_text += rowNode[j].innerHTML;
                 } else if (rowNode[j].nodeName == "Location") {
-                    
+                    locationNode = rowNode[j].children;
+                    if (locationNode.length > 0) {
+                        html_text += "<ul>";
+                        for (var k = 0; k < locationNode.length; k++) {
+                            html_text += "<li>" + locationNode[k].innerHTML + "</li>"
+                        }
+                        html_text += "</ul>";
+                    }
                 } else if (rowNode[j].nodeName == "HomePage") {
                     // TODO: should links open in a new tab/window? Just default?
                     html_text += "<a href=" + rowNode[j].innerHTML + ">" + rowNode[j].innerHTML + "</a>";
