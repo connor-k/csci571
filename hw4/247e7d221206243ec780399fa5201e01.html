@@ -64,7 +64,7 @@ function generateHTML(xmlDoc) {
                     // TODO: should links open in a new tab/window? Just default?
                     html_text += "<a href=" + rowNode[j].innerHTML + ">" + rowNode[j].innerHTML + "</a>";
                 } else if (rowNode[j].nodeName == "Logo") {
-                    
+                    html_text += "<img src='" + rowNode[j].innerHTML + "'>";
                 } else {
                     throw("Error in XML file: invalid tag in a table row.");
                 }
@@ -76,25 +76,6 @@ function generateHTML(xmlDoc) {
             throw("Error in XML file: invalid row tag in table.");
         }
     }
-    /*
-    // Output out the values for all planes
-    for (var i = 0; i < planes.length; i++) {
-        // Get properties of a plane
-        planeNodeList=planes.item(i).childNodes;
-        // Start a new row of the output table
-        html_text += "<tr>";
-        for (var j = 0; j < planeNodeList.length; j++) {
-            if (planeNodeList.item(j).nodeType == ELEMENT_NODE) {
-                //handle images separately
-                if (planeNodeList.item(j).nodeName == "Image") {
-                    html_text += "<td><img src='" + planeNodeList.item(j).firstChild.nodeValue + "' width='" + x + "' height='" + y + "'></td>";
-                } else {
-                    html_text += "<td>" + planeNodeList.item(j).firstChild.nodeValue + "</td>";
-                }
-            }
-        }
-        html_text += "</tr>";
-    }*/
     html_text += "</tbody>";
     html_text += "</table>";
     html_text += "</body></html>";
