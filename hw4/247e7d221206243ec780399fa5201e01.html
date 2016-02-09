@@ -13,7 +13,7 @@ function generateHTML(xmlDoc) {
     root = xmlDoc.DocumentElement;
     debug = xmlDoc;
     html_text = "<html><head><title>XML Parse Result</title></head><body>";
-    html_text += "<table border='2'>";
+    html_text += "<table border='2' width=100% height=100%>";
     table = xmlDoc.getElementsByTagName("Table").item(0).children;
     // Check that there's data
     if (table.length < 2) {
@@ -62,7 +62,7 @@ function generateHTML(xmlDoc) {
                     }
                 } else if (rowNode[j].nodeName == "HomePage") {
                     // TODO: should links open in a new tab/window? Just default?
-                    html_text += "<a href=" + rowNode[j].innerHTML + ">" + rowNode[j].innerHTML + "</a>";
+                    html_text += "<a href=" + rowNode[j].innerHTML + " target='_blank'>" + rowNode[j].innerHTML + "</a>";
                 } else if (rowNode[j].nodeName == "Logo") {
                     html_text += "<img src='" + rowNode[j].innerHTML + "'>";
                 } else {
@@ -82,16 +82,13 @@ function generateHTML(xmlDoc) {
 }
 
 function viewXML(what) {
-    var URL = what.URL.value;    
+    var URL = what.URL.value;
     function loadXML(url) {
         // Code for IE7+, Firefox, Chrome, Opera, Safari
         if (window.XMLHttpRequest) {
             xmlhttp = new XMLHttpRequest();
-        } else {
-            // Code for IE6, IE5
-            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            xmlhttp.open("GET", url, false);
         }
-        xmlhttp.open("GET", url, false);
         try {
             xmlhttp.send();
         } catch (e) {
@@ -101,29 +98,15 @@ function viewXML(what) {
         return xmlDoc;
     }
     xmlDoc = loadXML(URL);
-    // If IE, simply execute script (due to async prop).
-    if (window.ActiveXObject) {
-        if (xmlDoc.parseError.errorCode != 0) {
-            var myErr = xmlDoc.parseError;
-            error("Error in XML file");
-            hWin = window.open("", "Error", "height=300,width=340");
-            hWin.document.write(html_text);
-        } else {
-            generateHTML(xmlDoc);
-            hWin = window.open("", "Assignment4", "height=800,width=600");
-            hWin.document.write(html_text);
-        }
-    } else {
-        // Else if FF, execute script once XML object has loaded
-        try {
-            xmlDoc.onload = generateHTML(xmlDoc);
-            hWin = window.open("", "Assignment4", "height=800,width=600");
-            hWin.document.write(html_text);
-            hWin.document.close();
-        } catch (e) {
-            alert(e);
-        }
-    }
+    // FF code, execute script once XML object has loaded
+    try {
+        xmlDoc.onload = generateHTML(xmlDoc);
+        var hWin = window.open("", "Assignment4", "scrollbars=1,height=800,width=1200");
+        hWin.document.write(html_text);
+        hWin.document.close();
+    } catch (e) {
+        alert(e);
+    }    
 }
 </script>
 </head>
