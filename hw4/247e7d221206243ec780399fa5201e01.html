@@ -92,7 +92,7 @@ function viewXML(what) {
         try {
             xmlhttp.send();
         } catch (e) {
-            alert(e);
+            alert("Error in XML File");
         }
         xmlDoc = xmlhttp.responseXML;
         return xmlDoc;
@@ -105,7 +105,7 @@ function viewXML(what) {
         hWin.document.write(html_text);
         hWin.document.close();
     } catch (e) {
-        alert(e);
+        alert("Error in XML File (check that it exists and has valid syntax)");
     }    
 }
 </script>
