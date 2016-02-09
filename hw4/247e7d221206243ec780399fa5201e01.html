@@ -101,7 +101,7 @@ function viewXML(what) {
     // FF code, execute script once XML object has loaded
     try {
         xmlDoc.onload = generateHTML(xmlDoc);
-        var hWin = window.open("", "Assignment4", "scrollbars=1,height=800,width=1200");
+        var hWin = window.open("", "_blank", "scrollbars=1,height=800,width=1200");
         hWin.document.write(html_text);
         hWin.document.close();
     } catch (e) {
