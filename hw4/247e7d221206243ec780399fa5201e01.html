@@ -13,7 +13,7 @@ function generateHTML(xmlDoc) {
     root = xmlDoc.DocumentElement;
     debug = xmlDoc;
     html_text = "<html><head><title>XML Parse Result</title></head><body>";
-    html_text += "<table border='2' width=100% height=100%>";
+    html_text += "<table border='2' width=1180>";
     table = xmlDoc.getElementsByTagName("Table").item(0).children;
     // Check that there's data
     if (table.length < 2) {
