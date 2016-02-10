@@ -9,15 +9,13 @@
 function generateHTML(xmlDoc) {
     // MS parser doesn't define Node.ELEMENT_NODE
     var ELEMENT_NODE = 1;
-    // TODO looks like they used a lot of globals -- remove them later
     root = xmlDoc.DocumentElement;
-    debug = xmlDoc;
     html_text = "<html><head><title>XML Parse Result</title></head><body>";
-    html_text += "<table border='2' width=1180>";
+    html_text += "<table border='2' width=940>";
     table = xmlDoc.getElementsByTagName("Table").item(0).children;
     // Check that there's data
     if (table.length < 2) {
-        throw("Error in XML file: Missing tags."); //TODO check
+        throw("Error in XML file: Missing tags.");
     }
     // Titles
     tableTitleSection = table[0];
@@ -31,7 +29,6 @@ function generateHTML(xmlDoc) {
         if (tableColTitles[i].nodeName == "Data" && tableColTitles[i].nodeType == ELEMENT_NODE) {
             var colName = tableColTitles[i].innerHTML;
             html_text += "<th>" + colName + "</th>";
-            //TODO check if can be empty?
         } else {
             throw("Error in XML file: invalid data tag in headers.");
         }
@@ -44,33 +41,38 @@ function generateHTML(xmlDoc) {
         if (table[i].nodeName == "Row" && table[i].nodeType == ELEMENT_NODE) {
             html_text += "<tr>";
             rowNode = table[i].children;
-            // TODO check len?
             for (var j = 0; j < rowNode.length; j++) {
-                html_text += "<td>";
-                // TODO enforce order??
-                // TODO check that matches headers?
+                if (rowNode[j].nodeName == "Logo") {
+                    html_text += "<td style='width:200px; height:100px;'>";
+                } else {
+                    html_text += "<td>";
+                }                
+                
                 if (rowNode[j].nodeName == "CallSign" || rowNode[j].nodeName == "Frequency" || rowNode[j].nodeName == "Format") {
                     html_text += rowNode[j].innerHTML;
                 } else if (rowNode[j].nodeName == "Location") {
                     locationNode = rowNode[j].children;
-                    if (locationNode.length > 0) {
+                    if (locationNode.length >= 0 && locationNode.length <= 2) {
                         html_text += "<ul>";
                         for (var k = 0; k < locationNode.length; k++) {
                             html_text += "<li>" + locationNode[k].innerHTML + "</li>"
                         }
                         html_text += "</ul>";
+                    } else {
+                        throw("Extra location tag");
                     }
                 } else if (rowNode[j].nodeName == "HomePage") {
-                    // TODO: should links open in a new tab/window? Just default?
                     html_text += "<a href=" + rowNode[j].innerHTML + " target='_blank'>" + rowNode[j].innerHTML + "</a>";
                 } else if (rowNode[j].nodeName == "Logo") {
-                    html_text += "<img src='" + rowNode[j].innerHTML + "' width=100% height=100%>";
+                    // Only load the image if there's a URL here. If it's blank, display nothing
+                    if (rowNode[j].innerHTML.length > 0) {
+                        html_text += "<img src='" + rowNode[j].innerHTML + "' style='width:200px; height:100px;'>";
+                    }
                 } else {
                     throw("Error in XML file: invalid tag in a table row.");
                 }
                 html_text += "</td>";
             }
-            //TODO check if can be empty?
             html_text += "</tr>";
         } else {
             throw("Error in XML file: invalid row tag in table.");
@@ -101,11 +103,20 @@ function viewXML(what) {
     // FF code, execute script once XML object has loaded
     try {
         xmlDoc.onload = generateHTML(xmlDoc);
-        var hWin = window.open("", "_blank", "scrollbars=1,height=800,width=1200");
+        var hWin = window.open("", "_blank", "scrollbars=1,height=600,width=960");
         hWin.document.write(html_text);
         hWin.document.close();
     } catch (e) {
-        alert("Error in XML File (check that it exists and has valid syntax)");
+        // Special message if the file doesn't exist
+        if (e.message == "xmlDoc is null") {
+            alert("XML file doesn't exist.");
+        } else if (e == "Error in XML file: Missing tags.") {
+            // Special message if has no row elements
+            alert("Error in XML File (missing Row elements)");
+        } else {
+            // Generic message for everthing else (i.e. invalid syntax)
+            alert("Error in XML File (check that it has valid syntax)");
+        }
     }    
 }
 </script>
