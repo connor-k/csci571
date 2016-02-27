@@ -34,6 +34,11 @@
             margin-bottom: 24px;
         }
     </style>
+    <script lang="JavaScript">
+        function clearForm(f) {
+            f.search_input.value = "";
+        }
+    </script>
 </head>
 <body>
     <div class="search_box">
@@ -43,11 +48,11 @@
             <table align="center" class="search_table_layout">
                 <tr>
                     <td><span class="input_label">Company Name or Symbol:</span></td>
-                    <td><input type="text" ></td>
+                    <td><input type="text" name="search_input"></td>
                 </tr>
                 <tr align="left">
                     <td align="right"></td>
-                    <td><input type="submit" value="Search"><input type="reset" value="Clear"></td>
+                    <td><input type="submit" value="Search"><input type="button" value="Clear" onclick="clearForm(this.form)"></td>
                 </tr>
                 <tr>
                     <td colspan=2 align="right"><a href="http://www.markit.com/product/markit-on-demand" target="_blank">Powered by Markit on Demand</a></td>
