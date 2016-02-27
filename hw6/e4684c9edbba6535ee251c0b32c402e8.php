@@ -48,7 +48,8 @@
             <table align="center" class="search_table_layout">
                 <tr>
                     <td><span class="input_label">Company Name or Symbol:</span></td>
-                    <td><input type="text" name="search_input"></td>
+                    <!-- TODO change REQUIRED to use a dialog like example, see what they actually want... -->
+                    <td><input type="text" name="search_input" REQUIRED value="<?php echo isset($_POST["search_input"]) ? $_POST["search_input"] : "" ?>"></td>
                 </tr>
                 <tr align="left">
                     <td align="right"></td>
