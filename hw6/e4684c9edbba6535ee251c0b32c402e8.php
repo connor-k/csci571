@@ -62,7 +62,10 @@
     </style>
     <script lang="JavaScript">
         function clearForm(f) {
+            // Clear the input box
             f.search_input.value = "";
+            // Also clear the response area, as noted on Piazza
+            document.getElementById('query_response').innerHTML = "";
         }
     </script>
 </head>
@@ -107,7 +110,7 @@
                         echo "<td class='col1'>",$xml_root->LookupResult[$i]->Name,"</td>";
                         echo "<td>",$xml_root->LookupResult[$i]->Symbol,"</td>";
                         echo "<td>",$xml_root->LookupResult[$i]->Exchange,"</td>";
-                        echo "<td><a href='","#TODO","'>","More Info</a></td>";
+                        echo "<td><a href='#' onclick=","#TODO","'>","More Info</a></td>";
                         echo "</tr>";
                     }   
                 }
