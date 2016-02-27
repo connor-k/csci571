@@ -7,9 +7,9 @@
 </head>
 <body>
 <?php
+    // Lookup
     $lookup_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/Lookup/xml?input=';
     $input = 'GOOG';
-    //echo $lookup_baseurl, $input;
     // TODO would http_get be better?
     $lookup_response = file_get_contents($lookup_baseurl.$input);
     $xml_root = new SimpleXMLElement($lookup_response);
@@ -20,6 +20,20 @@
         echo $xml_root->LookupResult[$i]->Name,"<br>";
         echo $xml_root->LookupResult[$i]->Symbol,"<br>";
         echo $xml_root->LookupResult[$i]->Exchange,"<br><br>";
+    }
+    
+    // Quote
+    $quote_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/Quote/json?symbol=';
+    $input = 'AAPL';
+    // TODO would http_get be better?
+    $query_response = file_get_contents($quote_baseurl.$input);
+    echo "Got JSON response:<br>";
+    echo $query_response,"<br>";
+    $json_root = json_decode($query_response);
+    if ($json_root != null && $json_root->{'Status'} == 'SUCCESS') {
+        
+    } else {
+        
     }
 ?>
 <noscript>
