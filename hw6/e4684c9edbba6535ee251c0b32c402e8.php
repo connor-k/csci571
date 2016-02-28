@@ -59,6 +59,15 @@
         .col1 {
             width: 350px;
         }
+        
+        .center {
+            text-align: center;
+        }
+        
+        img {
+            height: 13px;
+            width: 13px;
+        }
     </style>
     <script lang="JavaScript">
         function clearForm(f) {
@@ -92,7 +101,8 @@
     </div>
     <div id="query_response">
         <?php
-            if (isset($_POST['search_input'])) {
+            if (false && isset($_POST['search_input'])) {
+                // TODO clear query variable
                 // Lookup
                 $lookup_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/Lookup/xml?input=';
                 $input = $_POST['search_input'];
@@ -110,27 +120,45 @@
                         echo "<td class='col1'>",$xml_root->LookupResult[$i]->Name,"</td>";
                         echo "<td>",$xml_root->LookupResult[$i]->Symbol,"</td>";
                         echo "<td>",$xml_root->LookupResult[$i]->Exchange,"</td>";
-                        echo "<td><a href='#' onclick=","#TODO","'>","More Info</a></td>";
+                        // TODO is it ok to us a JS function here?
+                        echo "<td><a href='#' onclick='","#TODO","'>","More Info</a></td>";
                         echo "</tr>";
-                    }   
+                    }
+                }
+                echo "</table>";
+            } else if (isset($_POST['search_input'])) { //query_click
+                // Quote
+                $quote_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/Quote/json?symbol=';
+                $input = $_POST['search_input'];
+                $query_response = file_get_contents($quote_baseurl.$input);
+                $json_root = json_decode($query_response);
+                
+                echo "<table class='response_table'>";
+                if ($json_root != null && $json_root->{'Status'} == 'SUCCESS') {
+                    // TODO force 2 decimal places
+                    // TODO timestamp format
+                    echo "<tr><th class='col1'>Name</th><td class='center'>",$json_root->{'Name'},"</tr>";
+                    echo "<tr><th class='col1'>Symbol</th><td class='center'>",$json_root->{'Symbol'},"</tr>";
+                    echo "<tr><th class='col1'>Last Price</th><td class='center'>",round($json_root->{'LastPrice'}, 2),"</tr>";
+                    $change = round($json_root->{'Change'}, 2);
+                    echo "<tr><th class='col1'>Change</th><td class='center'>",$change,($change > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($change < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
+                    $change = round($json_root->{'ChangePercent'}, 2);
+                    echo "<tr><th class='col1'>Change Percent</th><td class='center'>",$change,"%",($change > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($change < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
+                    echo "<tr><th class='col1'>Timestamp</th><td class='center'>",$json_root->{'Timestamp'},"</tr>"; //TODO format
+                    echo "<tr><th class='col1'>Market Cap</th><td class='center'>",round($json_root->{'MarketCap'}/1000000000.0, 2)," B</tr>";
+                    echo "<tr><th class='col1'>Volume</th><td class='center'>",number_format($json_root->{'Volume'}),"</tr>";
+                    $ytd = round($json_root->{'LastPrice'} - $json_root->{'ChangeYTD'}, 2);
+                    echo "<tr><th class='col1'>Change YTD</th><td class='center'>",$ytd < 0 ? "($ytd)" : $ytd,($ytd > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($ytd < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
+                    $change = round($json_root->{'ChangePercentYTD'}, 2);
+                    echo "<tr><th class='col1'>Change Percent YTD</th><td class='center'>",$change,"%",($change > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($change < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
+                    echo "<tr><th class='col1'>High</th><td class='center'>",round($json_root->{'High'}, 2),"</tr>";
+                    echo "<tr><th class='col1'>Low</th><td class='center'>",round($json_root->{'Low'}, 2),"</tr>";
+                    echo "<tr><th class='col1'>Open</th><td class='center'>",round($json_root->{'Open'}, 2),"</tr>";
+                } else {
+                    echo "<tr><td align='center'>There is no stock information available</td></tr>";
                 }
                 echo "</table>";
             }
-
-                /*/ Quote
-                $quote_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/Quote/json?symbol=';
-                $input = 'AAPL';
-                // TODO would http_get be better?
-                $query_response = file_get_contents($quote_baseurl.$input);
-                echo "Got JSON response:<br>";
-                echo $query_response,"<br>";
-                $json_root = json_decode($query_response);
-                if ($json_root != null && $json_root->{'Status'} == 'SUCCESS') {
-
-                } else {
-
-                }
-            }*/
         ?>
     </div>
 <noscript>
