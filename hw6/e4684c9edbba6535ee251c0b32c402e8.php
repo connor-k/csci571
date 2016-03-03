@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>ckerns HW4 - XML</title>
+    <title>ckerns HW6 - PHP</title>
     <style>
         .title {
             font-size: 1.6em;
@@ -121,28 +121,26 @@
                 $input = $_POST['more_info'];
                 $query_response = file_get_contents($quote_baseurl.$input);
                 $json_root = json_decode($query_response);
-                
                 echo "<table class='response_table'>";
                 if ($json_root != null && $json_root->{'Status'} == 'SUCCESS') {
-                    // TODO force 2 decimal places
                     // TODO timestamp format
                     echo "<tr><th class='col1'>Name</th><td class='center'>",$json_root->{'Name'},"</tr>";
                     echo "<tr><th class='col1'>Symbol</th><td class='center'>",$json_root->{'Symbol'},"</tr>";
-                    echo "<tr><th class='col1'>Last Price</th><td class='center'>",round($json_root->{'LastPrice'}, 2),"</tr>";
+                    echo "<tr><th class='col1'>Last Price</th><td class='center'>",number_format(round($json_root->{'LastPrice'}, 2), 2, '.', ''),"</tr>";
                     $change = round($json_root->{'Change'}, 2);
-                    echo "<tr><th class='col1'>Change</th><td class='center'>",$change,($change > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($change < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
+                    echo "<tr><th class='col1'>Change</th><td class='center'>",number_format($change, 2, '.', ''),($change > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($change < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
                     $change = round($json_root->{'ChangePercent'}, 2);
-                    echo "<tr><th class='col1'>Change Percent</th><td class='center'>",$change,"%",($change > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($change < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
+                    echo "<tr><th class='col1'>Change Percent</th><td class='center'>",number_format($change, 2, '.', ''),"%",($change > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($change < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
                     echo "<tr><th class='col1'>Timestamp</th><td class='center'>",$json_root->{'Timestamp'},"</tr>"; //TODO format
-                    echo "<tr><th class='col1'>Market Cap</th><td class='center'>",round($json_root->{'MarketCap'}/1000000000.0, 2)," B</tr>";
+                    echo "<tr><th class='col1'>Market Cap</th><td class='center'>",number_format(round($json_root->{'MarketCap'}/1000000000.0, 2), 2, '.', '')," B</tr>";
                     echo "<tr><th class='col1'>Volume</th><td class='center'>",number_format($json_root->{'Volume'}),"</tr>";
                     $ytd = round($json_root->{'LastPrice'} - $json_root->{'ChangeYTD'}, 2);
-                    echo "<tr><th class='col1'>Change YTD</th><td class='center'>",$ytd < 0 ? "($ytd)" : $ytd,($ytd > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($ytd < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
+                    echo "<tr><th class='col1'>Change YTD</th><td class='center'>",$ytd < 0 ? "(".number_format($ytd, 2, '.', '').")" : number_format($ytd, 2, '.', ''),($ytd > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($ytd < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
                     $change = round($json_root->{'ChangePercentYTD'}, 2);
-                    echo "<tr><th class='col1'>Change Percent YTD</th><td class='center'>",$change,"%",($change > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($change < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
-                    echo "<tr><th class='col1'>High</th><td class='center'>",round($json_root->{'High'}, 2),"</tr>";
-                    echo "<tr><th class='col1'>Low</th><td class='center'>",round($json_root->{'Low'}, 2),"</tr>";
-                    echo "<tr><th class='col1'>Open</th><td class='center'>",round($json_root->{'Open'}, 2),"</tr>";
+                    echo "<tr><th class='col1'>Change Percent YTD</th><td class='center'>",number_format($change, 2, '.', ''),"%",($change > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($change < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
+                    echo "<tr><th class='col1'>High</th><td class='center'>",number_format(round($json_root->{'High'}, 2), 2, '.', ''),"</tr>";
+                    echo "<tr><th class='col1'>Low</th><td class='center'>",number_format(round($json_root->{'Low'}, 2), 2, '.', ''),"</tr>";
+                    echo "<tr><th class='col1'>Open</th><td class='center'>",number_format(round($json_root->{'Open'}, 2), 2, '.', ''),"</tr>";
                 } else {
                     echo "<tr><td align='center'>There is no stock information available</td></tr>";
                 }
