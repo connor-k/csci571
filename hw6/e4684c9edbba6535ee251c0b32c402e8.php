@@ -76,9 +76,15 @@
             // Also clear the response area, as noted on Piazza
             document.getElementById('query_response').innerHTML = "";
         }
+        
+        function submitMoreInfo(s) {
+            document.getElementById('more_info').value = s;
+            document.getElementById('more_info_form').submit();
+        }
     </script>
 </head>
 <body>
+    <!-- The main search box -->
     <div class="search_box">
         <span class="title">Stock Search</span>
         <hr class="line">
@@ -87,7 +93,8 @@
                 <tr>
                     <td><span class="input_label">Company Name or Symbol:</span></td>
                     <!-- TODO change REQUIRED to use a dialog like example, see what they actually want... -->
-                    <td><input type="text" name="search_input" REQUIRED value="<?php echo isset($_POST['search_input']) ? $_POST['search_input'] : "" ?>"></td>
+                    <!-- TODO set value to more info term if click that?? -->
+                    <td><input type="text" name="search_input" REQUIRED value="<?php echo isset($_POST['search_input']) ? $_POST['search_input'] : (isset($_POST['more_info']) ? $_POST['more_info'] : "") ?>"></td>
                 </tr>
                 <tr align="left">
                     <td align="right"></td>
@@ -98,12 +105,14 @@
                 </tr>
             </table>
         </form>
-        <!-- A hidden form to submit requests when the user clicks More Info after a search -->
-        <form method="POST" action="" id="more_info_form" >
-            <input type="text" name="more_info" id="more_info">
-        </form>
-        <a onclick="document.getElementById('more_info').value = 'goog';document.getElementById('more_info_form').submit();">More Info</a>
     </div>
+    
+    <!-- A hidden form to submit requests when the user clicks More Info after a search -->
+    <form method="POST" action="" id="more_info_form" hidden>
+        <input type="text" name="more_info" id="more_info">
+    </form>
+    
+    <!-- The list of search results or detailed view for a given stock -->
     <div id="query_response">
         <?php
             if (isset($_POST['more_info'])) { //query_click
@@ -138,6 +147,8 @@
                     echo "<tr><td align='center'>There is no stock information available</td></tr>";
                 }
                 echo "</table>";
+                // Unset so this isn't displayed if they search
+                unset($_POST['more_info']);
             } else if (isset($_POST['search_input'])) {
                 // TODO clear query variable
                 // Lookup
@@ -157,8 +168,8 @@
                         echo "<td class='col1'>",$xml_root->LookupResult[$i]->Name,"</td>";
                         echo "<td>",$xml_root->LookupResult[$i]->Symbol,"</td>";
                         echo "<td>",$xml_root->LookupResult[$i]->Exchange,"</td>";
-                        // TODO is it ok to us a JS function here?
-                        echo "<td><a href='#' onclick='","#TODO","'>","More Info</a></td>";
+                        // TODO style link to not be clicked?
+                        echo "<td><a onClick=\"submitMoreInfo('",$xml_root->LookupResult[$i]->Symbol,"')\" href='",$xml_root->LookupResult[$i]->Symbol,"'>More Info</a></td>";
                         echo "</tr>";
                     }
                 }
