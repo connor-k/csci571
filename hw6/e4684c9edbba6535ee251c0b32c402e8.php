@@ -98,38 +98,18 @@
                 </tr>
             </table>
         </form>
+        <!-- A hidden form to submit requests when the user clicks More Info after a search -->
+        <form method="POST" action="" id="more_info_form" >
+            <input type="text" name="more_info" id="more_info">
+        </form>
+        <a onclick="document.getElementById('more_info').value = 'goog';document.getElementById('more_info_form').submit();">More Info</a>
     </div>
     <div id="query_response">
         <?php
-            if (false && isset($_POST['search_input'])) {
-                // TODO clear query variable
-                // Lookup
-                $lookup_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/Lookup/xml?input=';
-                $input = $_POST['search_input'];
-                $lookup_response = file_get_contents($lookup_baseurl.$input);
-                $xml_root = new SimpleXMLElement($lookup_response);
-                
-                echo "<table class='response_table'>";
-                // Check if there are any matches
-                if (sizeof($xml_root->LookupResult) == 0) {
-                    echo "<tr><td align='center'>No Record has been found</td></tr>";
-                } else {
-                    echo "<tr><th class='col1'>Name</th><th>Symbol</th><th>Exchange</th><th>Details</th></tr>";
-                    for ($i = 0; $i < sizeof($xml_root->LookupResult); $i++) {
-                        echo "<tr>";
-                        echo "<td class='col1'>",$xml_root->LookupResult[$i]->Name,"</td>";
-                        echo "<td>",$xml_root->LookupResult[$i]->Symbol,"</td>";
-                        echo "<td>",$xml_root->LookupResult[$i]->Exchange,"</td>";
-                        // TODO is it ok to us a JS function here?
-                        echo "<td><a href='#' onclick='","#TODO","'>","More Info</a></td>";
-                        echo "</tr>";
-                    }
-                }
-                echo "</table>";
-            } else if (isset($_POST['search_input'])) { //query_click
+            if (isset($_POST['more_info'])) { //query_click
                 // Quote
                 $quote_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/Quote/json?symbol=';
-                $input = $_POST['search_input'];
+                $input = $_POST['more_info'];
                 $query_response = file_get_contents($quote_baseurl.$input);
                 $json_root = json_decode($query_response);
                 
@@ -156,6 +136,31 @@
                     echo "<tr><th class='col1'>Open</th><td class='center'>",round($json_root->{'Open'}, 2),"</tr>";
                 } else {
                     echo "<tr><td align='center'>There is no stock information available</td></tr>";
+                }
+                echo "</table>";
+            } else if (isset($_POST['search_input'])) {
+                // TODO clear query variable
+                // Lookup
+                $lookup_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/Lookup/xml?input=';
+                $input = $_POST['search_input'];
+                $lookup_response = file_get_contents($lookup_baseurl.$input);
+                $xml_root = new SimpleXMLElement($lookup_response);
+                
+                echo "<table class='response_table'>";
+                // Check if there are any matches
+                if (sizeof($xml_root->LookupResult) == 0) {
+                    echo "<tr><td align='center'>No Record has been found</td></tr>";
+                } else {
+                    echo "<tr><th class='col1'>Name</th><th>Symbol</th><th>Exchange</th><th>Details</th></tr>";
+                    for ($i = 0; $i < sizeof($xml_root->LookupResult); $i++) {
+                        echo "<tr>";
+                        echo "<td class='col1'>",$xml_root->LookupResult[$i]->Name,"</td>";
+                        echo "<td>",$xml_root->LookupResult[$i]->Symbol,"</td>";
+                        echo "<td>",$xml_root->LookupResult[$i]->Exchange,"</td>";
+                        // TODO is it ok to us a JS function here?
+                        echo "<td><a href='#' onclick='","#TODO","'>","More Info</a></td>";
+                        echo "</tr>";
+                    }
                 }
                 echo "</table>";
             }
