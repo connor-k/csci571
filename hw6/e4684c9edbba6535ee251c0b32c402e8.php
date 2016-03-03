@@ -131,7 +131,13 @@
                     echo "<tr><th class='col1'>Change</th><td class='center'>",number_format($change, 2, '.', ''),($change > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($change < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
                     $change = round($json_root->{'ChangePercent'}, 2);
                     echo "<tr><th class='col1'>Change Percent</th><td class='center'>",number_format($change, 2, '.', ''),"%",($change > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($change < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
-                    echo "<tr><th class='col1'>Timestamp</th><td class='center'>",$json_root->{'Timestamp'},"</tr>"; //TODO format
+                    //$received_format = 'D M j H:i:s e y';
+                    $display_format = 'Y-m-d g:i A';
+                    $timestamp = $json_root->{'Timestamp'};
+                    date_default_timezone_set("America/Los_Angeles");
+                    $timestamp = strtotime($timestamp);
+                    $timestamp = date($display_format, $timestamp);
+                    echo "<tr><th class='col1'>Timestamp</th><td class='center'>",$timestamp,"</tr>";
                     echo "<tr><th class='col1'>Market Cap</th><td class='center'>",number_format(round($json_root->{'MarketCap'}/1000000000.0, 2), 2, '.', '')," B</tr>";
                     echo "<tr><th class='col1'>Volume</th><td class='center'>",number_format($json_root->{'Volume'}),"</tr>";
                     $ytd = round($json_root->{'LastPrice'} - $json_root->{'ChangeYTD'}, 2);
