@@ -39,13 +39,14 @@
         }
         
         .response_table {
-            width: 640px;
+            width: 560px;
             margin: 8px auto;
             border-collapse: collapse;
             border-style: solid;
             border-width: 2px;
             border-color: #C7C7C7;
             text-align: left;
+            font-size: 0.9em;
             font-family: sans-serif;
         }
         
@@ -61,17 +62,30 @@
             background-color: #FBFBFB;
         }
         
-        .col1 {
-            width: 350px;
-        }
-        
         .center {
             text-align: center;
+        }
+        
+        .col1 {
+            width: 270px;
+        }
+        
+        .col2 {
+            width: 270px;
+        }
+        
+        .symbol {
+            width: 50px;
+        }
+        
+        .exchange {
+            width: 110px;
         }
         
         .more_info {
             color: blue;
             text-decoration: underline;
+            width: 60px;
         }
         
         img {
@@ -95,9 +109,6 @@
 </head>
 <body>
     <!-- The main search box -->
-    <!-- TODO font family sans-seriff? -->
-    <!-- TODO convert whitespace to html friendly -- try search 'apple inc' -->
-    <!-- TODO rm leading whitespace and html'ify special chars -->
     <!-- TODO check more info wrapping search 'bank' -->
     <div class="search_box">
         <span class="title">Stock Search</span>
@@ -140,20 +151,20 @@
                 echo "<table class='response_table'>";
                 if ($json_root != null && $json_root->{'Status'} == 'SUCCESS') {
                     //TODO check round before or after display
-                    echo "<tr><th class='col1'>Name</th><td class='center'>",$json_root->{'Name'},"</tr>";
-                    echo "<tr><th class='col1'>Symbol</th><td class='center'>",$json_root->{'Symbol'},"</tr>";
-                    echo "<tr><th class='col1'>Last Price</th><td class='center'>",number_format(round($json_root->{'LastPrice'}, 2), 2, '.', ''),"</tr>";
+                    echo "<tr><th class='col1'>Name</th><td class='center col2'>",$json_root->{'Name'},"</tr>";
+                    echo "<tr><th class='col1'>Symbol</th><td class='center col2'>",$json_root->{'Symbol'},"</tr>";
+                    echo "<tr><th class='col1'>Last Price</th><td class='center col2'>",number_format(round($json_root->{'LastPrice'}, 2), 2, '.', ''),"</tr>";
                     $change = round($json_root->{'Change'}, 2);
-                    echo "<tr><th class='col1'>Change</th><td class='center'>",number_format($change, 2, '.', ''),($change > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($change < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
+                    echo "<tr><th class='col1'>Change</th><td class='center col2'>",number_format($change, 2, '.', ''),($change > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($change < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
                     $change = round($json_root->{'ChangePercent'}, 2);
-                    echo "<tr><th class='col1'>Change Percent</th><td class='center'>",number_format($change, 2, '.', ''),"%",($change > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($change < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
+                    echo "<tr><th class='col1'>Change Percent</th><td class='center col2'>",number_format($change, 2, '.', ''),"%",($change > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($change < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
                     //$received_format = 'D M j H:i:s e y';
                     $display_format = 'Y-m-d g:i A';
                     $timestamp = $json_root->{'Timestamp'};
                     date_default_timezone_set("America/Los_Angeles");
                     $timestamp = strtotime($timestamp);
                     $timestamp = date($display_format, $timestamp);
-                    echo "<tr><th class='col1'>Timestamp</th><td class='center'>",$timestamp,"</tr>";
+                    echo "<tr><th class='col1'>Timestamp</th><td class='center col2'>",$timestamp,"</tr>";
                     $market_cap_unit = "B";
                     $market_cap = round($json_root->{'MarketCap'}/1000000000.0, 2);
                     // Use millions if too small of a cap @314
@@ -161,15 +172,15 @@
                         $market_cap = round($json_root->{'MarketCap'}/1000000.0, 2);
                         $market_cap_unit = "M";
                     }
-                    echo "<tr><th class='col1'>Market Cap</th><td class='center'>",number_format($market_cap, 2, '.', '')," $market_cap_unit </tr>";
-                    echo "<tr><th class='col1'>Volume</th><td class='center'>",number_format($json_root->{'Volume'}),"</tr>";
+                    echo "<tr><th class='col1'>Market Cap</th><td class='center col2'>",number_format($market_cap, 2, '.', '')," $market_cap_unit </tr>";
+                    echo "<tr><th class='col1'>Volume</th><td class='center col2'>",number_format($json_root->{'Volume'}),"</tr>";
                     $ytd = round($json_root->{'LastPrice'} - $json_root->{'ChangeYTD'}, 2);
-                    echo "<tr><th class='col1'>Change YTD</th><td class='center'>",$ytd < 0 ? "(".number_format($ytd, 2, '.', '').")" : number_format($ytd, 2, '.', ''),($ytd > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($ytd < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
+                    echo "<tr><th class='col1'>Change YTD</th><td class='center col2'>",$ytd < 0 ? "(".number_format($ytd, 2, '.', '').")" : number_format($ytd, 2, '.', ''),($ytd > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($ytd < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
                     $change = round($json_root->{'ChangePercentYTD'}, 2);
-                    echo "<tr><th class='col1'>Change Percent YTD</th><td class='center'>",number_format($change, 2, '.', ''),"%",($change > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($change < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
-                    echo "<tr><th class='col1'>High</th><td class='center'>",number_format(round($json_root->{'High'}, 2), 2, '.', ''),"</tr>";
-                    echo "<tr><th class='col1'>Low</th><td class='center'>",number_format(round($json_root->{'Low'}, 2), 2, '.', ''),"</tr>";
-                    echo "<tr><th class='col1'>Open</th><td class='center'>",number_format(round($json_root->{'Open'}, 2), 2, '.', ''),"</tr>";
+                    echo "<tr><th class='col1'>Change Percent YTD</th><td class='center col2'>",number_format($change, 2, '.', ''),"%",($change > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($change < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
+                    echo "<tr><th class='col1'>High</th><td class='center col2'>",number_format(round($json_root->{'High'}, 2), 2, '.', ''),"</tr>";
+                    echo "<tr><th class='col1'>Low</th><td class='center col2'>",number_format(round($json_root->{'Low'}, 2), 2, '.', ''),"</tr>";
+                    echo "<tr><th class='col1'>Open</th><td class='center col2'>",number_format(round($json_root->{'Open'}, 2), 2, '.', ''),"</tr>";
                 } else {
                     echo "<tr><td align='center'>There is no stock information available</td></tr>";
                 }
@@ -194,12 +205,12 @@
                     if (sizeof($xml_root->LookupResult) == 0) {
                         echo "<tr><td align='center'>No Record has been found</td></tr>";
                     } else {
-                        echo "<tr><th class='col1'>Name</th><th>Symbol</th><th>Exchange</th><th>Details</th></tr>";
+                        echo "<tr><th class='col1'>Name</th><th class='symbol'>Symbol</th><th class='exchange'>Exchange</th><th style='width: 60px;'>Details</th></tr>";
                         for ($i = 0; $i < sizeof($xml_root->LookupResult); $i++) {
                             echo "<tr>";
                             echo "<td class='col1'>",$xml_root->LookupResult[$i]->Name,"</td>";
-                            echo "<td>",$xml_root->LookupResult[$i]->Symbol,"</td>";
-                            echo "<td>",$xml_root->LookupResult[$i]->Exchange,"</td>";
+                            echo "<td class='symbol'>",$xml_root->LookupResult[$i]->Symbol,"</td>";
+                            echo "<td class='exchange'>",$xml_root->LookupResult[$i]->Exchange,"</td>";
                             // TODO style link to not be clicked?
                             echo "<td><a class='more_info' onClick=\"submitMoreInfo('",$xml_root->LookupResult[$i]->Symbol,"')\">More Info</a></td>";
                             echo "</tr>";
