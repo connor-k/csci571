@@ -103,13 +103,13 @@
         
         function submitMoreInfo(s) {
             document.getElementById('more_info').value = s;
+            document.getElementById('old_search').value = document.getElementById('search_input').value;
             document.getElementById('more_info_form').submit();
         }
     </script>
 </head>
 <body>
     <!-- The main search box -->
-    <!-- TODO check more info wrapping search 'bank' -->
     <div class="search_box">
         <span class="title">Stock Search</span>
         <hr class="line">
@@ -118,7 +118,7 @@
                 <tr>
                     <td><span class="input_label">Company Name or Symbol:</span></td>
                     <!--  @328 -->
-                    <td><input type="text" name="search_input" REQUIRED value="<?php echo isset($_POST['search_input']) ? $_POST['search_input'] : (isset($_POST['old_search']) ? $_POST['old_search'] : "") ?>" pattern=".*[^\s]+.*" onInvalid="setCustomValidity('Please fill out this field.')" onKeyUp="try{setCustomValidity('')}catch(e){}"></td>
+                    <td><input type="text" name="search_input" id="search_input" REQUIRED value="<?php echo isset($_POST['search_input']) ? $_POST['search_input'] : (isset($_POST['old_search']) ? $_POST['old_search'] : "") ?>" pattern=".*[^\s]+.*" onInvalid="setCustomValidity('Please fill out this field.')" onKeyUp="try{setCustomValidity('')}catch(e){}"></td>
                 </tr>
                 <tr align="left">
                     <td align="right"></td>
@@ -132,11 +132,11 @@
     </div>
     
     <!-- A hidden form to submit requests when the user clicks More Info after a search -->
-    <!-- TODO search clear click and query back -- remove it -->
     <form method="POST" action="" id="more_info_form" hidden>
         <input type="text" name="more_info" id="more_info">
-        <!-- Have a dummy field for search_input in this form to set when they click more info. This makes it so the search box doesn't change. @216 -->
-        <input type="text" name="old_search" value="<?php echo isset($_POST['search_input']) ? $_POST['search_input'] : (isset($_POST['more_info']) ? $_POST['more_info'] : "") ?>">
+        <!-- Have a dummy field for search_input in this form to set when they click more info. 
+            It's set to the value of search_input on submit. This makes it so the search box doesn't change. @216 -->
+        <input type="text" name="old_search" id="old_search">
     </form>
     
     <!-- The list of search results or detailed view for a given stock -->
