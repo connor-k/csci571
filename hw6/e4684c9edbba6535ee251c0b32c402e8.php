@@ -21,7 +21,7 @@
             padding-top: 8px;
             margin: 0 auto;
             width: 405px;
-            background-color: #F2F2F2;
+            background-color: #F4F4F4;
             border-style: solid;
             border-width: 1px;
             border-color: #C7C7C7;
@@ -35,7 +35,7 @@
         }
         
         th {
-            background-color: #F2F2F2;
+            background-color: #F4F4F4;
         }
         
         .response_table {
@@ -46,6 +46,7 @@
             border-width: 2px;
             border-color: #C7C7C7;
             text-align: left;
+            font-family: sans-serif;
         }
         
         .response_table th, .response_table td {
@@ -54,6 +55,10 @@
             border-style: solid;
             border-width: 1px;
             border-color: #CBCBCB;
+        }
+        
+        .response_table td {
+            background-color: #FBFBFB;
         }
         
         .col1 {
