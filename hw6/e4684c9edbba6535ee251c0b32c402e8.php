@@ -93,8 +93,7 @@
                 <tr>
                     <td><span class="input_label">Company Name or Symbol:</span></td>
                     <!-- TODO change REQUIRED to use a dialog like example, see what they actually want... -->
-                    <!-- TODO set value to more info term if click that?? -->
-                    <td><input type="text" name="search_input" REQUIRED value="<?php echo isset($_POST['search_input']) ? $_POST['search_input'] : (isset($_POST['more_info']) ? $_POST['more_info'] : "") ?>"></td>
+                    <td><input type="text" name="search_input" REQUIRED value="<?php echo isset($_POST['search_input']) ? $_POST['search_input'] : (isset($_POST['old_search']) ? $_POST['old_search'] : "") ?>"></td>
                 </tr>
                 <tr align="left">
                     <td align="right"></td>
@@ -110,6 +109,8 @@
     <!-- A hidden form to submit requests when the user clicks More Info after a search -->
     <form method="POST" action="" id="more_info_form" hidden>
         <input type="text" name="more_info" id="more_info">
+        <!-- Have a dummy field for search_input in this form to set when they click more info. This makes it so the search box doesn't change. @216 -->
+        <input type="text" name="old_search" value="<?php echo isset($_POST['search_input']) ? $_POST['search_input'] : (isset($_POST['more_info']) ? $_POST['more_info'] : "") ?>">
     </form>
     
     <!-- The list of search results or detailed view for a given stock -->
@@ -138,7 +139,14 @@
                     $timestamp = strtotime($timestamp);
                     $timestamp = date($display_format, $timestamp);
                     echo "<tr><th class='col1'>Timestamp</th><td class='center'>",$timestamp,"</tr>";
-                    echo "<tr><th class='col1'>Market Cap</th><td class='center'>",number_format(round($json_root->{'MarketCap'}/1000000000.0, 2), 2, '.', '')," B</tr>";
+                    $market_cap_unit = "B";
+                    $market_cap = round($json_root->{'MarketCap'}/1000000000.0, 2);
+                    // Use millions if too small of a cap @314
+                    if ($market_cap == 0.00) {
+                        $market_cap = round($json_root->{'MarketCap'}/1000000.0, 2);
+                        $market_cap_unit = "M";
+                    }
+                    echo "<tr><th class='col1'>Market Cap</th><td class='center'>",number_format($market_cap, 2, '.', '')," $market_cap_unit </tr>";
                     echo "<tr><th class='col1'>Volume</th><td class='center'>",number_format($json_root->{'Volume'}),"</tr>";
                     $ytd = round($json_root->{'LastPrice'} - $json_root->{'ChangeYTD'}, 2);
                     echo "<tr><th class='col1'>Change YTD</th><td class='center'>",$ytd < 0 ? "(".number_format($ytd, 2, '.', '').")" : number_format($ytd, 2, '.', ''),($ytd > 0 ? "<img src='Green_Arrow_Up.png' alt='Down'></img>" : ($ytd < 0 ? "<img src='Red_Arrow_Down.png'></img>" : "")),"</tr>";
