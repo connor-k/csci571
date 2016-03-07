@@ -64,6 +64,11 @@
             text-align: center;
         }
         
+        .more_info {
+            color: blue;
+            text-decoration: underline;
+        }
+        
         img {
             height: 13px;
             width: 13px;
@@ -85,6 +90,10 @@
 </head>
 <body>
     <!-- The main search box -->
+    <!-- TODO font family sans-seriff? -->
+    <!-- TODO convert whitespace to html friendly -- try search 'apple inc' -->
+    <!-- TODO rm leading whitespace and html'ify special chars -->
+    <!-- TODO check more info wrapping search 'bank' -->
     <div class="search_box">
         <span class="title">Stock Search</span>
         <hr class="line">
@@ -92,8 +101,8 @@
             <table align="center" class="search_table_layout">
                 <tr>
                     <td><span class="input_label">Company Name or Symbol:</span></td>
-                    <!-- TODO change REQUIRED to use a dialog like example, see what they actually want... -->
-                    <td><input type="text" name="search_input" REQUIRED value="<?php echo isset($_POST['search_input']) ? $_POST['search_input'] : (isset($_POST['old_search']) ? $_POST['old_search'] : "") ?>"></td>
+                    <!--  @328 -->
+                    <td><input type="text" name="search_input" REQUIRED value="<?php echo isset($_POST['search_input']) ? $_POST['search_input'] : (isset($_POST['old_search']) ? $_POST['old_search'] : "") ?>" pattern=".*[^\s]+.*" onInvalid="setCustomValidity('Please fill out this field.')" onKeyUp="try{setCustomValidity('')}catch(e){}"></td>
                 </tr>
                 <tr align="left">
                     <td align="right"></td>
@@ -107,6 +116,7 @@
     </div>
     
     <!-- A hidden form to submit requests when the user clicks More Info after a search -->
+    <!-- TODO search clear click and query back -- remove it -->
     <form method="POST" action="" id="more_info_form" hidden>
         <input type="text" name="more_info" id="more_info">
         <!-- Have a dummy field for search_input in this form to set when they click more info. This makes it so the search box doesn't change. @216 -->
@@ -119,12 +129,12 @@
             if (isset($_POST['more_info'])) { //query_click
                 // Quote
                 $quote_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/Quote/json?symbol=';
-                $input = $_POST['more_info'];
+                $input = urlencode(htmlspecialchars(trim($_POST['more_info'])));
                 $query_response = file_get_contents($quote_baseurl.$input);
                 $json_root = json_decode($query_response);
                 echo "<table class='response_table'>";
                 if ($json_root != null && $json_root->{'Status'} == 'SUCCESS') {
-                    // TODO timestamp format
+                    //TODO check round before or after display
                     echo "<tr><th class='col1'>Name</th><td class='center'>",$json_root->{'Name'},"</tr>";
                     echo "<tr><th class='col1'>Symbol</th><td class='center'>",$json_root->{'Symbol'},"</tr>";
                     echo "<tr><th class='col1'>Last Price</th><td class='center'>",number_format(round($json_root->{'LastPrice'}, 2), 2, '.', ''),"</tr>";
@@ -159,33 +169,39 @@
                     echo "<tr><td align='center'>There is no stock information available</td></tr>";
                 }
                 echo "</table>";
-                // Unset so this isn't displayed if they search
+                // Unset so this isn't displayed if they search again.
                 unset($_POST['more_info']);
             } else if (isset($_POST['search_input'])) {
-                // TODO clear query variable
                 // Lookup
                 $lookup_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/Lookup/xml?input=';
-                $input = $_POST['search_input'];
-                $lookup_response = file_get_contents($lookup_baseurl.$input);
-                $xml_root = new SimpleXMLElement($lookup_response);
-                
-                echo "<table class='response_table'>";
-                // Check if there are any matches
-                if (sizeof($xml_root->LookupResult) == 0) {
-                    echo "<tr><td align='center'>No Record has been found</td></tr>";
+                $input = urlencode(htmlspecialchars(trim($_POST['search_input'])));
+                // From @286, we need to validate for empty form on Safari too. So, validate the input
+                // here too in case it got past the html5 form validation (i.e. not supported) and create
+                // the desired alert if the input was bad
+                if (strlen($input) == 0) {
+                    echo "<script>alert('Please enter Name or Symbol')</script>";
                 } else {
-                    echo "<tr><th class='col1'>Name</th><th>Symbol</th><th>Exchange</th><th>Details</th></tr>";
-                    for ($i = 0; $i < sizeof($xml_root->LookupResult); $i++) {
-                        echo "<tr>";
-                        echo "<td class='col1'>",$xml_root->LookupResult[$i]->Name,"</td>";
-                        echo "<td>",$xml_root->LookupResult[$i]->Symbol,"</td>";
-                        echo "<td>",$xml_root->LookupResult[$i]->Exchange,"</td>";
-                        // TODO style link to not be clicked?
-                        echo "<td><a onClick=\"submitMoreInfo('",$xml_root->LookupResult[$i]->Symbol,"')\" href='",$xml_root->LookupResult[$i]->Symbol,"'>More Info</a></td>";
-                        echo "</tr>";
+                    $lookup_response = file_get_contents($lookup_baseurl.$input);
+                    $xml_root = new SimpleXMLElement($lookup_response);
+
+                    echo "<table class='response_table'>";
+                    // Check if there are any matches
+                    if (sizeof($xml_root->LookupResult) == 0) {
+                        echo "<tr><td align='center'>No Record has been found</td></tr>";
+                    } else {
+                        echo "<tr><th class='col1'>Name</th><th>Symbol</th><th>Exchange</th><th>Details</th></tr>";
+                        for ($i = 0; $i < sizeof($xml_root->LookupResult); $i++) {
+                            echo "<tr>";
+                            echo "<td class='col1'>",$xml_root->LookupResult[$i]->Name,"</td>";
+                            echo "<td>",$xml_root->LookupResult[$i]->Symbol,"</td>";
+                            echo "<td>",$xml_root->LookupResult[$i]->Exchange,"</td>";
+                            // TODO style link to not be clicked?
+                            echo "<td><a class='more_info' onClick=\"submitMoreInfo('",$xml_root->LookupResult[$i]->Symbol,"')\">More Info</a></td>";
+                            echo "</tr>";
+                        }
                     }
+                    echo "</table>";   
                 }
-                echo "</table>";
             }
         ?>
     </div>
