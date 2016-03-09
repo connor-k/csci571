@@ -146,8 +146,13 @@
                 // Quote
                 $quote_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/Quote/json?symbol=';
                 $input = urlencode(htmlspecialchars(trim($_POST['more_info'])));
-                $query_response = file_get_contents($quote_baseurl.$input);
-                $json_root = json_decode($query_response);
+                // TODO handle bad response nicely
+                $query_response = @file_get_contents($quote_baseurl.$input);
+                if ($query_response !== false) {
+                    $json_root = json_decode($query_response);
+                } else {
+                    $json_root = null;
+                }
                 echo "<table class='response_table'>";
                 if ($json_root != null && $json_root->{'Status'} == 'SUCCESS') {
                     //TODO add PST to timestamp?
@@ -197,12 +202,16 @@
                 if (strlen($input) == 0) {
                     echo "<script>alert('Please enter Name or Symbol')</script>";
                 } else {
-                    $lookup_response = file_get_contents($lookup_baseurl.$input);
-                    $xml_root = new SimpleXMLElement($lookup_response);
+                    $lookup_response = @file_get_contents($lookup_baseurl.$input);
+                    if ($lookup_response !== false) {
+                        $xml_root = new SimpleXMLElement($lookup_response);
+                    } else {
+                        $xml_root = null;
+                    }
 
                     echo "<table class='response_table'>";
                     // Check if there are any matches
-                    if (sizeof($xml_root->LookupResult) == 0) {
+                    if ($xml_root == null || sizeof($xml_root->LookupResult) == 0) {
                         echo "<tr><td align='center'>No Record has been found</td></tr>";
                     } else {
                         echo "<tr><th class='col1'>Name</th><th class='symbol'>Symbol</th><th class='exchange'>Exchange</th><th style='width: 60px;'>Details</th></tr>";
