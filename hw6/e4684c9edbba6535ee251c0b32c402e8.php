@@ -146,7 +146,7 @@
                 // Quote
                 $quote_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/Quote/json?symbol=';
                 $input = urlencode(htmlspecialchars(trim($_POST['more_info'])));
-                // TODO handle bad response nicely
+                // Handle bad response nicely
                 $query_response = @file_get_contents($quote_baseurl.$input);
                 if ($query_response !== false) {
                     $json_root = json_decode($query_response);
@@ -155,7 +155,6 @@
                 }
                 echo "<table class='response_table'>";
                 if ($json_root != null && $json_root->{'Status'} == 'SUCCESS') {
-                    //TODO add PST to timestamp?
                     echo "<tr><th class='col1'>Name</th><td class='center col2'>",$json_root->{'Name'},"</tr>";
                     echo "<tr><th class='col1'>Symbol</th><td class='center col2'>",$json_root->{'Symbol'},"</tr>";
                     echo "<tr><th class='col1'>Last Price</th><td class='center col2'>",number_format(round($json_root->{'LastPrice'}, 2), 2, '.', ''),"</tr>";
@@ -169,11 +168,11 @@
                     date_default_timezone_set("America/Los_Angeles");
                     $timestamp = strtotime($timestamp);
                     $timestamp = date($display_format, $timestamp);
-                    echo "<tr><th class='col1'>Timestamp</th><td class='center col2'>",$timestamp,"</tr>";
+                    echo "<tr><th class='col1'>Timestamp</th><td class='center col2'>",$timestamp," PST</tr>";
                     $market_cap_unit = "B";
                     $market_cap = round($json_root->{'MarketCap'}/1000000000.0, 2);
                     // Use millions if too small of a cap @314
-                    if ($market_cap == 0.00) {
+                    if ($market_cap < 1.0) {
                         $market_cap = round($json_root->{'MarketCap'}/1000000.0, 2);
                         $market_cap_unit = "M";
                     }
@@ -203,6 +202,7 @@
                     echo "<script>alert('Please enter Name or Symbol')</script>";
                 } else {
                     $lookup_response = @file_get_contents($lookup_baseurl.$input);
+                    // Handle bad response nicely
                     if ($lookup_response !== false) {
                         $xml_root = new SimpleXMLElement($lookup_response);
                     } else {
