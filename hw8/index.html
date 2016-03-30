@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Basic Bootstrap Template</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script lang="JavaScript">
+        function clearForm(f) {
+            // Clear the input box
+            f.search_input.value = "";
+            // Also clear the response area, as noted on Piazza
+            //TODO document.getElementById('query_response').innerHTML = "";
+            alert("TODO");
+        }
+    </script>
+</head>
+<body class="align-center">
+    <div class="container_panel panel panel-default partial-width align-center">
+        <form class="form-horizontal align-center">
+            <div class="form-group">
+                <div class="align-center col-sm-12">
+                    <label class="">Stock Market Search</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-4">
+                    <label for="search_input" class="control-label">Enter the stock name or symbol<span class="red">*</span></label>
+                </div>
+                <div class="col-sm-6">
+                    <input type="text" class="form-control" id="search_input" placeholder="Apple Inc or AAPL" REQUIRED pattern=".*[^\s]+.*" onInvalid="setCustomValidity('Please fill out this field.')" onKeyUp="try{setCustomValidity('')}catch(e){}">
+                </div>
+                <div class="col-sm-2">
+                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Get Quote</button>
+                    <button type="button" class="btn btn-default" onClick="clearForm(this.form)"><span class="glyphicon glyphicon-refresh"></span> Clear</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-12 align-right">
+                    <span>Powered By:</span><img src="mod-logo.png" width="120" height="24"></img>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <hr class="align-center partial-width margin-16">
+
+    <div class="container_panel panel panel-default partial-width align-center">
+        <div class="result_panel panel panel-default">
+            <div class="panel-heading">Favorite List</div>
+            <div class="panel-body">
+                Panel content
+            </div>
+        </div>
+    </div>
+
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+</body>
+</html>
