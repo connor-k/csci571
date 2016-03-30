@@ -22,7 +22,8 @@
         // Do the number processing (ex: rounding) on the server side
         if ($json_root != null && $json_root->{'Status'} == 'SUCCESS') {
             $json_root->{'LastPrice'} = number_format(round($json_root->{'LastPrice'}, 2), 2, '.', '');
-            //TODO can't round change though since 0 may still need arrow... check all those
+            $json_root->{'Change'} = number_format(round($json_root->{'Change'}, 2), 2, '.', '');
+            $json_root->{'ChangePercent'} = number_format(round($json_root->{'ChangePercent'}, 2), 2, '.', '');
             //$received_format = 'D M j H:i:s e y';
             $display_format = 'Y-m-d g:i A';
             $timestamp = $json_root->{'Timestamp'};
@@ -31,15 +32,22 @@
             $timestamp = date($display_format, $timestamp);
             $json_root->{'Timestamp'} = $timestamp;
             // TODO more precise rounding here
-            $market_cap_unit = "B";
+            $market_cap_unit = "Billion";
             $market_cap = round($json_root->{'MarketCap'}/1000000000.0, 2);
             // Use millions if too small of a cap
             if ($market_cap < 1.0) {
                 $market_cap = round($json_root->{'MarketCap'}/1000000.0, 2);
-                $market_cap_unit = "M";
+                $market_cap_unit = "Million";
+            }
+            // If < 1 M, no unit
+            if ($market_cap < 1.0) {
+                $market_cap = round($json_root->{'MarketCap'}, 2);
+                $market_cap_unit = "";
             }
             $json_root->{'MarketCap'} = number_format($market_cap, 2, '.', '')." ".$market_cap_unit;
             $json_root->{'Volume'} = number_format($json_root->{'Volume'});
+            $json_root->{'ChangeYTD'} = number_format(round($json_root->{'LastPrice'} - $json_root->{'ChangeYTD'}, 2), 2, '.', '');
+            $json_root->{'ChangePercentYTD'} = number_format(round($json_root->{'ChangePercentYTD'}, 2), 2, '.', '');
             $json_root->{'High'} = number_format(round($json_root->{'High'}, 2), 2, '.', '');
             $json_root->{'Low'} = number_format(round($json_root->{'Low'}, 2), 2, '.', '');
             $json_root->{'Open'} = number_format(round($json_root->{'Open'}, 2), 2, '.', '');
