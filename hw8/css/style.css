@@ -25,9 +25,17 @@ hr {
     clear: right;
 }
 
-.margin-16 {
+.margin-tb-16 {
     margin-top: 16px;
     margin-bottom: 16px;
+}
+
+.margin-16 {
+    margin: 16px;
+}
+
+.padding-b-16 {
+    padding-bottom: 32px;
 }
 
 .partial-width {
@@ -36,4 +44,8 @@ hr {
 
 .red {
     color: red;
+}
+
+.text-left {
+    text-align: left;
 }
