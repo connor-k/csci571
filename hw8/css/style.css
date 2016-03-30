@@ -1,0 +1,39 @@
+body {
+    background-color: #1B55CC;
+    padding: 8px;
+}
+
+hr {
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.align-center {
+    text-align: center;
+    margin: 0 auto;
+}
+
+.align-left {
+    text-align: left;
+    float: left;
+    clear: left;
+}
+
+.align-right {
+    text-align: right;
+    float: right;
+    clear: right;
+}
+
+.margin-16 {
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.partial-width {
+    width: 76%;
+}
+
+.red {
+    color: red;
+}
