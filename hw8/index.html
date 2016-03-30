@@ -63,6 +63,7 @@
 
     <div id="carousel-main" class="carousel slide">
         <div class="carousel-inner">
+
             <div class="item active">
                 <div class="container_panel panel panel-default partial-width align-center padding-16">
                     <div class="panel panel-default">
@@ -114,8 +115,52 @@
                     </div>
                 </div>
             </div>
+
             <div class="item">
-                <p>Other!</p>
+                <div class="container_panel panel panel-default partial-width align-center padding-16">
+                    <div class="panel panel-default">
+                        <div class="panel-heading gray-gradient no-bottom">
+                            <span class="row favorite-list-header">
+                                <span class="col-sm-1 align-left">
+                                    <button type="button" class="btn btn-default" href="#carousel-main" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></button>
+                                </span>
+                                <span class="col-sm-11">
+                                    <label class="control-label align-center">Stock Details</label>
+                                </span>
+                            </span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped no-bottom">
+                                    <tr>
+                                        <th>TODO change table and chart, new grid</th>
+                                        <th>Company Name</th>
+                                        <th>Stock Price</th>
+                                        <th>Change (Percent Change)</th>
+                                        <th>Market Cap</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left">Dummy data</td>
+                                        <td class="text-left">Company Name</td>
+                                        <td class="text-left">Stock Price</td>
+                                        <td class="text-left">Change (Percent Change)</td>
+                                        <td class="text-left">Market Cap</td>
+                                        <td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite('<first>')"><span class="glyphicon glyphicon-trash"></span></button></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left">Symbol</td>
+                                        <td class="text-left">Company Name</td>
+                                        <td class="text-left">Stock Price</td>
+                                        <td class="text-left">Change (Percent Change)</td>
+                                        <td class="text-left">Market Cap</td>
+                                        <td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite('<second>')"><span class="glyphicon glyphicon-trash"></span></button></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -123,5 +168,12 @@
     <script src="js/bootstrap.min.js"></script>
     <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
     <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+
+    <script>
+        // Prevent carousel from changing automatically
+        $('#carousel-main').carousel({
+          interval: false
+        })
+    </script>
 </body>
 </html>
