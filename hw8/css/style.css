@@ -1,5 +1,6 @@
 body {
-    background-color: #1B55CC;
+    background-image: url('/background.jpg');
+    background-size: 100%;
     padding: 8px;
 }
 
