@@ -10,9 +10,23 @@
         function clearForm(f) {
             // Clear the input box
             f.search_input.value = "";
+            //TODO anything else?
+            alert("TODO clear pushed");
+        }
+
+        function toggleAutoRefresh() {
             // Also clear the response area, as noted on Piazza
-            //TODO document.getElementById('query_response').innerHTML = "";
-            alert("TODO");
+            alert("TODO AutoRefresh is " + document.getElementById('auto-refresh-toggle').checked);
+        }
+
+        function refreshFavorites() {
+            //TODO refresh only the price and change columns
+            alert("TODO refresh favorites pushed.");
+        }
+
+        function removeFavorite(symbol) {
+            //TODO remove from table and local storage
+            alert("TODO remove favorite pushed with symbol " + symbol + ".");
         }
     </script>
 </head>
@@ -60,8 +74,8 @@
                                 <span class="col-sm-5"></span>
                                 <span class="col-sm-5 align-right">
                                     <span>Automatic Refresh:</span>
-                                    <input type="checkbox" data-toggle="toggle" data-size="normal">
-                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
+                                    <input id="auto-refresh-toggle" type="checkbox" data-toggle="toggle" data-size="normal" onChange="toggleAutoRefresh()">
+                                    <button type="button" class="btn btn-default" onClick="refreshFavorites()"><span class="glyphicon glyphicon-refresh"></span></button>
                                     <button type="button" class="btn btn-default" href="#carousel-main" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></button>
                                 </span>
 
@@ -84,7 +98,7 @@
                                         <td class="text-left">Stock Price</td>
                                         <td class="text-left">Change (Percent Change)</td>
                                         <td class="text-left">Market Cap</td>
-                                        <td class="text-left"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span></button></td>
+                                        <td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite('<first>')"><span class="glyphicon glyphicon-trash"></span></button></td>
                                     </tr>
                                     <tr>
                                         <td class="text-left">Symbol</td>
@@ -92,7 +106,7 @@
                                         <td class="text-left">Stock Price</td>
                                         <td class="text-left">Change (Percent Change)</td>
                                         <td class="text-left">Market Cap</td>
-                                        <td class="text-left"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span></button></td>
+                                        <td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite('<second>')"><span class="glyphicon glyphicon-trash"></span></button></td>
                                     </tr>
                                 </table>
                             </div>
