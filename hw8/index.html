@@ -47,54 +47,67 @@
 
     <hr class="align-center partial-width margin-tb-16">
 
-    <div class="container_panel panel panel-default partial-width align-center padding-b-16">
-            <div class="well">
-                <form class="form-horizontal">
-                    <span class="form-group">
-                        <span class="col-sm-2">
-                            <label class="control-label">Favorite List</label>
-                        </span>
-                        <span class="col-sm-6"></span>
-                        <span class="col-sm-4">
-                            <span>Automatic Refresh:</span>
-                            <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
-                            <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
-                            <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-chevron-right"></span></button>
-                        </span>
-                    </span>
-                </form>
-            </div>
-            <div class="table-responsive margin-16">
-                <table class="table table-striped">
-                        <tr>
-                            <th>Symbol</th>
-                            <th>Company Name</th>
-                            <th>Stock Price</th>
-                            <th>Change (Percent Change)</th>
-                            <th>Market Cap</th>
-                            <th></th>
-                        </tr>
-                        <tr>
-                            <td class="text-left">Dummy data</td>
-                            <td class="text-left">Company Name</td>
-                            <td class="text-left">Stock Price</td>
-                            <td class="text-left">Change (Percent Change)</td>
-                            <td class="text-left">Market Cap</td>
-                            <td class="text-left"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span></button></td>
-                        </tr>
-                        <tr>
-                            <td class="text-left">Symbol</td>
-                            <td class="text-left">Company Name</td>
-                            <td class="text-left">Stock Price</td>
-                            <td class="text-left">Change (Percent Change)</td>
-                            <td class="text-left">Market Cap</td>
-                            <td class="text-left"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span></button></td>
-                        </tr>
-                </table>
-            </div>
-    </div>
+    <div id="carousel-main" class="carousel slide">
+        <div class="carousel-inner">
+            <div class="item active">
+                <div class="container_panel panel panel-default partial-width align-center padding-16">
+                    <div class="panel panel-default">
+                        <div class="panel-heading gray-gradient no-bottom">
+                            <span class="row favorite-list-header">
+                                <span class="col-sm-2">
+                                    <label class="control-label align-left">Favorite List</label>
+                                </span>
+                                <span class="col-sm-5"></span>
+                                <span class="col-sm-5 align-right">
+                                    <span>Automatic Refresh:</span>
+                                    <input type="checkbox" data-toggle="toggle" data-size="normal">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span></button>
+                                    <button type="button" class="btn btn-default" href="#carousel-main" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></button>
+                                </span>
 
+                            </span>
+                        </div>
+                        <div class="panel-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped no-bottom">
+                                    <tr>
+                                        <th>Symbol</th>
+                                        <th>Company Name</th>
+                                        <th>Stock Price</th>
+                                        <th>Change (Percent Change)</th>
+                                        <th>Market Cap</th>
+                                        <th></th>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left">Dummy data</td>
+                                        <td class="text-left">Company Name</td>
+                                        <td class="text-left">Stock Price</td>
+                                        <td class="text-left">Change (Percent Change)</td>
+                                        <td class="text-left">Market Cap</td>
+                                        <td class="text-left"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span></button></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-left">Symbol</td>
+                                        <td class="text-left">Company Name</td>
+                                        <td class="text-left">Stock Price</td>
+                                        <td class="text-left">Change (Percent Change)</td>
+                                        <td class="text-left">Market Cap</td>
+                                        <td class="text-left"><button type="button" class="btn btn-default"><span class="glyphicon glyphicon-trash"></span></button></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="item">
+                <p>Other!</p>
+            </div>
+        </div>
+    </div>
     <script src="http://code.jquery.com/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 </body>
 </html>

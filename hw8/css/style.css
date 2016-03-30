@@ -25,6 +25,15 @@ hr {
     clear: right;
 }
 
+.favorite-list-header {
+    margin: 4px 0px 0px;
+}
+
+.gray-gradient {
+    background: #EBEBEB;
+    background: linear-gradient(#F6F6F6, #E8E8E8);
+}
+
 .margin-tb-16 {
     margin-top: 16px;
     margin-bottom: 16px;
@@ -32,6 +41,23 @@ hr {
 
 .margin-16 {
     margin: 16px;
+}
+
+.no-margin {
+    margin: 0px;
+}
+
+.no-padding {
+    padding: 0px;
+}
+
+.no-bottom {
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+
+.padding-16 {
+    padding: 16px;
 }
 
 .padding-b-16 {
