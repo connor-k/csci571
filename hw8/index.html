@@ -36,7 +36,8 @@
 
   $(function() {
     function log( message ) {
-      $( "<div>" ).text( message ).prependTo( "#log" );
+      //$( "<div>" ).text( message ).prependTo( "#log" );
+      $( "#autocomplete-matches" ).text( message ).prependTo( "#log" );
       $( "#log" ).scrollTop( 0 );
     }
 
@@ -119,7 +120,8 @@
                                 <span class="col-sm-5"></span>
                                 <span class="col-sm-5 align-right">
                                     <span>Automatic Refresh:</span>
-                                    <input id="auto-refresh-toggle" type="checkbox" data-toggle="toggle" data-size="normal" onChange="toggleAutoRefresh()">
+                                    <input id="auto-refresh-toggle" type="checkbox" data-toggle="toggle" data-size="normal" onChange="toggleAutoRefresh()" list="autocomplete-matches">
+                                    <datalist id="autocomplete-matches"></datalist>
                                     <button type="button" class="btn btn-default" onClick="refreshFavorites()"><span class="glyphicon glyphicon-refresh"></span></button>
                                     <button type="button" class="btn btn-default" href="#carousel-main" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></button>
                                 </span>
