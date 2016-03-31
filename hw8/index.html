@@ -10,8 +10,9 @@
         function clearForm(f) {
             // Clear the input box
             f.search_input.value = "";
-            //TODO anything else?
-            alert("TODO clear pushed");
+            //TODO clear any validation errors if necessary
+            // Move carousel back to favorites
+            $('#carousel-main').carousel(0);
         }
 
         function toggleAutoRefresh() {
@@ -34,7 +35,7 @@
     <div class="container_panel panel panel-default partial-width align-center">
         <form class="form-horizontal">
             <div class="form-group">
-                <div class="align-center col-sm-12">
+                <div class="align-center col-sm-12 padding-t-16">
                     <label class="">Stock Market Search</label>
                 </div>
             </div>
@@ -172,7 +173,7 @@
     <script>
         // Prevent carousel from changing automatically
         $('#carousel-main').carousel({
-          interval: false
+            interval: false
         })
     </script>
 </body>

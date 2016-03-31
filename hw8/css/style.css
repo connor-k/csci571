@@ -61,8 +61,12 @@ hr {
     padding: 16px;
 }
 
-.padding-b-16 {
+.padding-b-32 {
     padding-bottom: 32px;
+}
+
+.padding-t-16 {
+    padding-top: 16px;
 }
 
 .partial-width {
