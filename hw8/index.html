@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
     <script lang="JavaScript">
         function clearForm(f) {
             // Clear the input box
@@ -30,6 +32,46 @@
             alert("TODO remove favorite pushed with symbol " + symbol + ".");
         }
     </script>
+    <script>
+
+  $(function() {
+    function log( message ) {
+      $( "<div>" ).text( message ).prependTo( "#log" );
+      $( "#log" ).scrollTop( 0 );
+    }
+
+    $( "#search_input" ).autocomplete({
+      source: function( request, response ) {
+        $.ajax({
+          url: "http://localhost/",
+          data: {input: request.term},
+          success: function( data ) {
+            autocomplete_symbol_lookup = [];
+            autocomplete_display = [];
+            var js_data = JSON.parse(data);
+            for (var i = 0; i < js_data.length; i++) {
+                autocomplete_symbol_lookup[js_data[i]['Display']] = js_data[i]['Symbol'];
+                autocomplete_display.push(js_data[i]['Display']);
+            }
+            response(autocomplete_display);
+          }
+        });
+      },
+      minLength: 1,
+      select: function( event, ui ) {
+        log( ui.item ?
+          "Selected: " + autocomplete_symbol_lookup[ui.item.label] :
+          "Nothing selected, input was " + this.value);
+      },
+      open: function() {
+        $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+      },
+      close: function() {
+        $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+      }
+    });
+  });
+  </script>
 </head>
 <body class="align-center">
     <div class="container_panel panel panel-default partial-width align-center">
@@ -45,9 +87,10 @@
                 </div>
                 <div class="col-sm-6">
                     <input type="text" class="form-control" id="search_input" placeholder="Apple Inc or AAPL" REQUIRED pattern=".*[^\s]+.*" onInvalid="setCustomValidity('Please fill out this field.')" onKeyUp="try{setCustomValidity('')}catch(e){}">
+                    <div id="log"></div>
                 </div>
                 <div class="col-sm-3">
-                    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Get Quote</button>
+                    <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Get Quote</button>
                     <button type="button" class="btn btn-default" onClick="clearForm(this.form)"><span class="glyphicon glyphicon-refresh"></span> Clear</button>
                 </div>
             </div>
@@ -165,7 +208,6 @@
             </div>
         </div>
     </div>
-    <script src="http://code.jquery.com/jquery.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
     <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>

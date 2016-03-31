@@ -15,7 +15,7 @@
         }
         if ($json_root != null) {
             for ($i = 0; $i < sizeof($json_root); $i++) {
-                $json_root[$i] = $json_root[$i]->{'Symbol'}." - ".$json_root[$i]->{'Name'}." ( ".$json_root[$i]->{'Exchange'}." )";
+                $json_root[$i]->{'Display'} = $json_root[$i]->{'Symbol'}." - ".$json_root[$i]->{'Name'}." ( ".$json_root[$i]->{'Exchange'}." )";
             }
 
             $response = json_encode($json_root, JSON_PRETTY_PRINT);
