@@ -11,7 +11,7 @@
     <script lang="JavaScript">
         function clearForm(f) {
             // Clear the input box
-            f.search_input.value = "";
+            document.getElementById('search_input').value = "";
             //TODO clear any validation errors if necessary
             // Move carousel back to favorites
             $('#carousel-main').carousel(0);
@@ -75,13 +75,13 @@
 </head>
 <body class="align-center">
     <div class="container_panel panel panel-default partial-width align-center">
-        <form class="form-horizontal">
-            <div class="form-group">
+        <div class="padding-16">
+            <div class="row">
                 <div class="align-center col-sm-12 padding-t-16">
                     <label class="">Stock Market Search</label>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="row">
                 <div class="col-sm-3">
                     <label for="search_input" class="control-label">Enter the stock name or symbol<span class="red">*</span></label>
                 </div>
@@ -91,16 +91,16 @@
                 </div>
                 <div class="col-sm-3">
                     <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Get Quote</button>
-                    <button type="button" class="btn btn-default" onClick="clearForm(this.form)"><span class="glyphicon glyphicon-refresh"></span> Clear</button>
+                    <button type="button" class="btn btn-default" onClick="clearForm()"><span class="glyphicon glyphicon-refresh"></span> Clear</button>
                 </div>
             </div>
-            <div class="form-group">
+            <div class="row">
                 <div class="col-sm-9"></div>
                 <div class="col-sm-3">
                     <span>Powered By:</span><img src="mod-logo.png" width="120" height="24"></img>
                 </div>
             </div>
-        </form>
+        </div>
     </div>
 
     <hr class="align-center partial-width margin-tb-16">
