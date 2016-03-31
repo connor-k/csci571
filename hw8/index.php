@@ -1,14 +1,25 @@
 <?php
     define('ACTION_LOOKUP', 'input');
     define('ACTION_QUOTE', 'symbol');
-    //TODO parsing on this end for rounding fields and such
+
     if (isset($_GET[ACTION_LOOKUP])) {
         $lookup_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/Lookup/json?input=';
         $input = urlencode(htmlspecialchars(trim($_GET[ACTION_LOOKUP])));
         // Handle bad response nicely
         $lookup_response = @file_get_contents($lookup_baseurl.$input);
+        // Preprocess the response to get the desired list format
         if ($lookup_response !== false) {
-            printf("%s", $lookup_response);
+            $json_root = json_decode($lookup_response);
+        } else {
+            $json_root = null;
+        }
+        if ($json_root != null) {
+            for ($i = 0; $i < sizeof($json_root); $i++) {
+                $json_root[$i] = $json_root[$i]->{'Symbol'}." - ".$json_root[$i]->{'Name'}." ( ".$json_root[$i]->{'Exchange'}." )";
+            }
+
+            $response = json_encode($json_root, JSON_PRETTY_PRINT);
+            printf("%s", $response);
         }
     } else if (isset($_GET[ACTION_QUOTE])) {
         $quote_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/Quote/json?symbol=';
