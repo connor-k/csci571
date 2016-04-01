@@ -8,7 +8,24 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <script src="http://code.jquery.com/jquery.min.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
     <script lang="JavaScript">
+        // The current stock to display in the details section
+        symbol = "AAPL"; //TODO remove
+
+        function submitSearch() {
+            // Check that the input matches a symbol from the lookup response
+            symbol = document.getElementById('search_input').value.toUpperCase();
+            if (autocomplete_symbols[symbol]) {
+                // Do the search
+                $('#carousel-main').carousel(1);
+                doCurrentStock();
+            } else {
+                // Display error message
+                $('#select-valid-error').show();
+            }
+        }
+
         function clearForm(f) {
             // Clear the input box
             document.getElementById('search_input').value = "";
@@ -31,26 +48,48 @@
             //TODO remove from table and local storage
             alert("TODO remove favorite pushed with symbol " + symbol + ".");
         }
+
+        function selectDetailedNav(id) {
+            // Make all inactive
+            $('#current-stock-nav').removeClass('active');
+            $('#historical-charts-nav').removeClass('active');
+            $('#news-feed-nav').removeClass('active');
+            $('#' + id).addClass('active');
+        }
+
+        function doCurrentStock() {
+            selectDetailedNav('current-stock-nav');
+            //TODO
+        }
+
+        function doHistoricalCharts() {
+            selectDetailedNav('historical-charts-nav');
+            //TODO
+        }
+
+        function doNewsFeed() {
+            selectDetailedNav('news-feed-nav');
+            //TODO
+        }
+
     </script>
     <script>
 
   $(function() {
-    function log( message ) {
-      //$( "<div>" ).text( message ).prependTo( "#log" );
-      $( "#autocomplete-matches" ).text( message ).prependTo( "#log" );
-      $( "#log" ).scrollTop( 0 );
-    }
-
     $( "#search_input" ).autocomplete({
       source: function( request, response ) {
+        // Since they're typing something, make sure the error text is hidden
+        $('#select-valid-error').hide();
         $.ajax({
           url: "http://localhost/",
           data: {input: request.term},
           success: function( data ) {
+            autocomplete_symbols = [];
             autocomplete_symbol_lookup = [];
-            autocomplete_display = [];
+            var autocomplete_display = [];
             var js_data = JSON.parse(data);
             for (var i = 0; i < js_data.length; i++) {
+                autocomplete_symbols[js_data[i]['Symbol']] = true;
                 autocomplete_symbol_lookup[js_data[i]['Display']] = js_data[i]['Symbol'];
                 autocomplete_display.push(js_data[i]['Display']);
             }
@@ -60,9 +99,10 @@
       },
       minLength: 1,
       select: function( event, ui ) {
-        log( ui.item ?
-          "Selected: " + autocomplete_symbol_lookup[ui.item.label] :
-          "Nothing selected, input was " + this.value);
+        if (ui.item) {
+            document.getElementById('search_input').value = autocomplete_symbol_lookup[ui.item.label];
+            return false;
+        }
       },
       open: function() {
         $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
@@ -91,12 +131,15 @@
                     <div id="log"></div>
                 </div>
                 <div class="col-sm-3">
-                    <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-search"></span> Get Quote</button>
+                    <button type="button" class="btn btn-primary" onClick="submitSearch()"><span class="glyphicon glyphicon-search"></span> Get Quote</button>
                     <button type="button" class="btn btn-default" onClick="clearForm()"><span class="glyphicon glyphicon-refresh"></span> Clear</button>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-sm-9"></div>
+            <div class="row padding-t-16">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-6">
+                    <span class="red align-left" id="select-valid-error" hidden><small>Select a valid entry</small></span>
+                </div>
                 <div class="col-sm-3">
                     <span>Powered By:</span><img src="mod-logo.png" width="120" height="24"></img>
                 </div>
@@ -176,6 +219,12 @@
                             </span>
                         </div>
                         <div class="panel-body">
+                        <ul class="nav nav-pills padding-16">
+                          <li id="current-stock-nav" class="active"><a onClick="doCurrentStock()"><span class="glyphicon glyphicon-dashboard"></span> Current Stock</a></li>
+                          <li id="historical-charts-nav"><a onClick="doHistoricalCharts()"><span class="glyphicon glyphicon-stats"></span> Historical Charts</a></li>
+                          <li id="news-feed-nav"><a onClick="doNewsFeed()"><span class="glyphicon glyphicon-link"></span> News Feeds</a></li>
+                        </ul>
+                        <hr style="margin: 8px 16px 16px;">
                             <div class="table-responsive">
                                 <table class="table table-striped no-bottom">
                                     <tr>
@@ -219,6 +268,8 @@
         $('#carousel-main').carousel({
             interval: false
         })
+        //TODO temp for faster viewing
+        $('#carousel-main').carousel(1);
     </script>
 </body>
 </html>
