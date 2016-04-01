@@ -35,6 +35,10 @@ hr {
     background: linear-gradient(#F6F6F6, #E8E8E8);
 }
 
+.green {
+    color: green;
+}
+
 .margin-tb-16 {
     margin-top: 16px;
     margin-bottom: 16px;
@@ -42,6 +46,10 @@ hr {
 
 .margin-16 {
     margin: 16px;
+}
+
+.margin-8 {
+    margin: 8px;
 }
 
 .no-margin {

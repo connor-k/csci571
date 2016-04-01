@@ -59,7 +59,34 @@
 
         function doCurrentStock() {
             selectDetailedNav('current-stock-nav');
-            //TODO
+            // Populate table info
+            $.ajax({
+              url: "http://localhost/",
+              data: {symbol: symbol},
+              success: function(data) {
+                var js_data = JSON.parse(data);
+                d = js_data; //TODO remove
+                //TODO icons
+                $('#stock-table-name').text(js_data['Name']);
+                $('#stock-table-symbol').text(js_data['Symbol']);
+                $('#stock-table-last-price').text('$ ' + js_data['LastPrice']);
+                var positive = Number(js_data['Change']) > 0;
+                var display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['Change'] + ' ( ' + js_data['ChangePercent'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
+                $('#stock-table-change-percent').html(display);
+                $('#stock-table-timestamp').text(js_data['Timestamp']);
+                $('#stock-table-market-cap').text(js_data['MarketCap']);
+                $('#stock-table-volume').text(js_data['Volume']);
+                positive = Number(js_data['ChangeYTD']) > 0;
+                display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['ChangeYTD'] + ' ( ' + js_data['ChangePercentYTD'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
+                $('#stock-table-change-ytd').html(display);
+                $('#stock-table-high-price').text('$ ' + js_data['High']);
+                $('#stock-table-low-price').text('$ ' + js_data['Low']);
+                $('#stock-table-opening-price').text('$ ' + js_data['Open']);
+              }
+            });
+
+            // Yahoo daily stock chart API call
+            $('#stock-day-chart').html("<img src=https://chart.yahoo.com/t?s=" + symbol + "&lang=en-US&width=400&height=300></img>");
         }
 
         function doHistoricalCharts() {
@@ -70,6 +97,16 @@
         function doNewsFeed() {
             selectDetailedNav('news-feed-nav');
             //TODO
+        }
+
+        function makeFavorite() {
+            //TODO
+            alert('Favorite');
+        }
+
+        function facebookPost() {
+            //TODO
+            alert('Facebook');
         }
 
     </script>
@@ -218,41 +255,80 @@
                                 </span>
                             </span>
                         </div>
-                        <div class="panel-body">
-                        <ul class="nav nav-pills padding-16">
+                        <div class="panel-body margin-8">
+                        <ul class="nav nav-pills">
                           <li id="current-stock-nav" class="active"><a onClick="doCurrentStock()"><span class="glyphicon glyphicon-dashboard"></span> Current Stock</a></li>
                           <li id="historical-charts-nav"><a onClick="doHistoricalCharts()"><span class="glyphicon glyphicon-stats"></span> Historical Charts</a></li>
                           <li id="news-feed-nav"><a onClick="doNewsFeed()"><span class="glyphicon glyphicon-link"></span> News Feeds</a></li>
                         </ul>
-                        <hr style="margin: 8px 16px 16px;">
+                        <hr>
+                        <div class="row" id="current-stock-div">
+                  <div class="col-sm-6 ">
                             <div class="table-responsive">
                                 <table class="table table-striped no-bottom">
+                                <thead>
                                     <tr>
-                                        <th>TODO change table and chart, new grid</th>
-                                        <th>Company Name</th>
-                                        <th>Stock Price</th>
-                                        <th>Change (Percent Change)</th>
-                                        <th>Market Cap</th>
-                                        <th></th>
+                                        <th colspan="2">Stock Details</th>
+                                    </tr>
+                            </thead>
+                            <tbody>
+                                    <tr>
+                                        <th class="text-left">Name</th>
+                                        <td class="text-left" id="stock-table-name"></td>
                                     </tr>
                                     <tr>
-                                        <td class="text-left">Dummy data</td>
-                                        <td class="text-left">Company Name</td>
-                                        <td class="text-left">Stock Price</td>
-                                        <td class="text-left">Change (Percent Change)</td>
-                                        <td class="text-left">Market Cap</td>
-                                        <td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite('<first>')"><span class="glyphicon glyphicon-trash"></span></button></td>
+                                        <th class="text-left">Symbol</th>
+                                        <td class="text-left" id="stock-table-symbol"></td>
                                     </tr>
                                     <tr>
-                                        <td class="text-left">Symbol</td>
-                                        <td class="text-left">Company Name</td>
-                                        <td class="text-left">Stock Price</td>
-                                        <td class="text-left">Change (Percent Change)</td>
-                                        <td class="text-left">Market Cap</td>
-                                        <td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite('<second>')"><span class="glyphicon glyphicon-trash"></span></button></td>
+                                        <th class="text-left">Last Price</th>
+                                        <td class="text-left" id="stock-table-last-price"></td>
                                     </tr>
+                                    <tr>
+                                        <th class="text-left">Change (Change Percent)</th>
+                                        <td class="text-left" id="stock-table-change-percent"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-left">Time and Date</th>
+                                        <td class="text-left" id="stock-table-timestamp"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-left">Market Cap</th>
+                                        <td class="text-left" id="stock-table-market-cap"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-left">Volume</th>
+                                        <td class="text-left" id="stock-table-volume"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-left">Change YTD (Change Percent YTD)</th>
+                                        <td class="text-left" id="stock-table-change-ytd"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-left">High Price</th>
+                                        <td class="text-left" id="stock-table-high-price"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-left">Low Price</th>
+                                        <td class="text-left" id="stock-table-low-price"></td>
+                                    </tr>
+                                    <tr>
+                                        <th class="text-left">Opening Price</th>
+                                        <td class="text-left" id="stock-table-opening-price"></td>
+                                    </tr>
+                            </tbody>
                                 </table>
                             </div>
+            </div>
+            <div class="col-sm-6">
+                <span class="align-right">
+                    <button type="button" class="btn btn-default" onClick="clearForm()"><span class="glyphicon glyphicon-refresh"></span> Clear</button>
+                    <button type="button" class="btn btn-default" onClick="clearForm()"><span class="glyphicon glyphicon-refresh"></span> Clear</button>
+                </span>
+                <div id="stock-day-chart"></div>
+            </div>
+
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -270,6 +346,7 @@
         })
         //TODO temp for faster viewing
         $('#carousel-main').carousel(1);
+        doCurrentStock();
     </script>
 </body>
 </html>
