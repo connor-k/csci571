@@ -13,12 +13,74 @@
     // The current stock to display in the details section
     symbol = "AAPL"; //TODO remove
 
+    function updateAPIData() {
+      // Current Stock data
+      $.ajax({
+        url: "http://localhost/",
+        data: {symbol: symbol},
+        success: function(data) {
+        var js_data = JSON.parse(data);
+        d = js_data; //TODO remove
+        //TODO icons
+        $('#stock-table-name').text(js_data['Name']);
+        $('#stock-table-symbol').text(js_data['Symbol']);
+        $('#stock-table-last-price').text('$ ' + js_data['LastPrice']);
+        var positive = Number(js_data['Change']) > 0;
+        var display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['Change'] + ' ( ' + js_data['ChangePercent'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
+        $('#stock-table-change-percent').html(display);
+        $('#stock-table-timestamp').text(js_data['Timestamp']);
+        $('#stock-table-market-cap').text(js_data['MarketCap']);
+        $('#stock-table-volume').text(js_data['Volume']);
+        positive = Number(js_data['ChangeYTD']) > 0;
+        display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['ChangeYTD'] + ' ( ' + js_data['ChangePercentYTD'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
+        $('#stock-table-change-ytd').html(display);
+        $('#stock-table-high-price').text('$ ' + js_data['High']);
+        $('#stock-table-low-price').text('$ ' + js_data['Low']);
+        $('#stock-table-opening-price').text('$ ' + js_data['Open']);
+        }
+      });
+
+      // Yahoo daily stock chart API call
+      $('#stock-day-chart').html("<img src=https://chart.yahoo.com/t?s=" + symbol + "&lang=en-US&width=400&height=300></img>");
+
+      // News data
+      $.ajax({
+        url: "http://localhost/",
+        data: {news: symbol},
+        success: function(data) {
+          var js_data = JSON.parse(data);
+          var block1 = '<div class="well text-left margin-16"><p><a href="';
+          var block2 = '#">';
+          var block3 = '</a><br>';
+          var block4 = '<br><br><b>Publisher: ';
+          var block5 = '<br><br>Date: ';
+          var block6 = '</b></p></div>';
+          var feed = "";
+          try {
+            for (var i = 0; i < js_data['responseData']['results'].length; i++) {
+              feed += block1 + js_data['responseData']['results'][i]['unescapedUrl'];
+              feed += block2 + js_data['responseData']['results'][i]['titleNoFormatting'];
+              feed += block3 + js_data['responseData']['results'][i]['content'];
+              feed += block4 + js_data['responseData']['results'][i]['publisher'];
+              feed += block5 + js_data['responseData']['results'][i]['publishedDate'] + block6;
+            }
+            $('#news-feed-div').html(feed);
+          } catch (e) {
+            alert(e);
+            $('#news-feed-div').html('<p>Note: Google News Feed QPS Exceeded</p>');
+          }
+        }
+      });
+    }
+
     function submitSearch() {
       // Check that the input matches a symbol from the lookup response
       symbol = document.getElementById('search_input').value.toUpperCase();
       if (autocomplete_symbols[symbol]) {
         // Do the search
         $('#carousel-main').carousel(1);
+        // Update data and show the current stock info page
+        updateAPIData();
         doCurrentStock();
       } else {
         // Display error message
@@ -66,34 +128,7 @@
     function doCurrentStock() {
       selectDetailedNav('current-stock-nav');
       showDetailedDiv('current-stock-div');
-      // Populate table info
-      $.ajax({
-        url: "http://localhost/",
-        data: {symbol: symbol},
-        success: function(data) {
-        var js_data = JSON.parse(data);
-        d = js_data; //TODO remove
-        //TODO icons
-        $('#stock-table-name').text(js_data['Name']);
-        $('#stock-table-symbol').text(js_data['Symbol']);
-        $('#stock-table-last-price').text('$ ' + js_data['LastPrice']);
-        var positive = Number(js_data['Change']) > 0;
-        var display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['Change'] + ' ( ' + js_data['ChangePercent'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
-        $('#stock-table-change-percent').html(display);
-        $('#stock-table-timestamp').text(js_data['Timestamp']);
-        $('#stock-table-market-cap').text(js_data['MarketCap']);
-        $('#stock-table-volume').text(js_data['Volume']);
-        positive = Number(js_data['ChangeYTD']) > 0;
-        display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['ChangeYTD'] + ' ( ' + js_data['ChangePercentYTD'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
-        $('#stock-table-change-ytd').html(display);
-        $('#stock-table-high-price').text('$ ' + js_data['High']);
-        $('#stock-table-low-price').text('$ ' + js_data['Low']);
-        $('#stock-table-opening-price').text('$ ' + js_data['Open']);
-        }
-      });
 
-      // Yahoo daily stock chart API call
-      $('#stock-day-chart').html("<img src=https://chart.yahoo.com/t?s=" + symbol + "&lang=en-US&width=400&height=300></img>");
     }
 
     function doHistoricalCharts() {
@@ -105,17 +140,6 @@
     function doNewsFeed() {
       selectDetailedNav('news-feed-nav');
       showDetailedDiv('news-feed-div');
-      //TODO
-
-      // Google news api call
-      $.ajax({
-        url: "http://localhost/",
-        data: {news: symbol},
-        success: function(data) {
-        //var js_data = JSON.parse(data);
-        news = data;//js_data;
-        }
-      });
     }
 
     function makeFavorite() {
@@ -348,9 +372,7 @@
               <div class="row" id="historical-charts-div" hidden>
                 Historical charts
               </div>
-              <div class="row" id="news-feed-div" hidden>
-                News feed
-              </div>
+              <div class="row" id="news-feed-div" hidden></div>
             </div>
           </div>
         </div>

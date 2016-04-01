@@ -70,7 +70,6 @@
         $news_baseurl = 'https://ajax.googleapis.com/ajax/services/search/news?v=1.0&q=';
         $news_endurl = '&userip=128.9.112.1'; //TODO change ip?
         $input = urlencode(htmlspecialchars(trim($_GET[ACTION_NEWS])));
-        // Handle bad response nicely
         $response = @file_get_contents($news_baseurl.$input.$news_endurl);
         printf("%s", $response);
     }
