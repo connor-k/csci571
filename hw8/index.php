@@ -1,6 +1,7 @@
 <?php
     define('ACTION_LOOKUP', 'input');
     define('ACTION_QUOTE', 'symbol');
+    define('ACTION_NEWS', 'news');
 
     if (isset($_GET[ACTION_LOOKUP])) {
         $lookup_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/Lookup/json?input=';
@@ -65,5 +66,12 @@
             $response = json_encode($json_root, JSON_PRETTY_PRINT);
             printf("%s", $response);
         }
+    } else if (isset($_GET[ACTION_NEWS])) {
+        $news_baseurl = 'https://ajax.googleapis.com/ajax/services/search/news?v=1.0&q=';
+        $news_endurl = '&userip=128.9.112.1'; //TODO change ip?
+        $input = urlencode(htmlspecialchars(trim($_GET[ACTION_NEWS])));
+        // Handle bad response nicely
+        $response = @file_get_contents($news_baseurl.$input.$news_endurl);
+        printf("%s", $response);
     }
 ?>

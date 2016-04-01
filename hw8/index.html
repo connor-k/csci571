@@ -1,352 +1,374 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <title>Homework 8 | ckerns</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-    <script src="http://code.jquery.com/jquery.min.js"></script>
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-    <script lang="JavaScript">
-        // The current stock to display in the details section
-        symbol = "AAPL"; //TODO remove
+  <meta charset="utf-8">
+  <title>Homework 8 | ckerns</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="css/style.css">
+  <script src="http://code.jquery.com/jquery.min.js"></script>
+  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script lang="JavaScript">
+    // The current stock to display in the details section
+    symbol = "AAPL"; //TODO remove
 
-        function submitSearch() {
-            // Check that the input matches a symbol from the lookup response
-            symbol = document.getElementById('search_input').value.toUpperCase();
-            if (autocomplete_symbols[symbol]) {
-                // Do the search
-                $('#carousel-main').carousel(1);
-                doCurrentStock();
-            } else {
-                // Display error message
-                $('#select-valid-error').show();
-            }
+    function submitSearch() {
+      // Check that the input matches a symbol from the lookup response
+      symbol = document.getElementById('search_input').value.toUpperCase();
+      if (autocomplete_symbols[symbol]) {
+        // Do the search
+        $('#carousel-main').carousel(1);
+        doCurrentStock();
+      } else {
+        // Display error message
+        $('#select-valid-error').show();
+      }
+    }
+
+    function clearForm(f) {
+      // Clear the input box
+      document.getElementById('search_input').value = "";
+      //TODO clear any validation errors if necessary
+      // Move carousel back to favorites
+      $('#carousel-main').carousel(0);
+    }
+
+    function toggleAutoRefresh() {
+      // Also clear the response area, as noted on Piazza
+      alert("TODO AutoRefresh is " + document.getElementById('auto-refresh-toggle').checked);
+    }
+
+    function refreshFavorites() {
+      //TODO refresh only the price and change columns
+      alert("TODO refresh favorites pushed.");
+    }
+
+    function removeFavorite(symbol) {
+      //TODO remove from table and local storage
+      alert("TODO remove favorite pushed with symbol " + symbol + ".");
+    }
+
+    function selectDetailedNav(id) {
+      $('#current-stock-nav').removeClass('active');
+      $('#historical-charts-nav').removeClass('active');
+      $('#news-feed-nav').removeClass('active');
+      $('#' + id).addClass('active');
+    }
+
+    function showDetailedDiv(id) {
+      $('#current-stock-div').hide();
+      $('#historical-charts-div').hide();
+      $('#news-feed-div').hide()
+      $('#' + id).show();
+    }
+
+    function doCurrentStock() {
+      selectDetailedNav('current-stock-nav');
+      showDetailedDiv('current-stock-div');
+      // Populate table info
+      $.ajax({
+        url: "http://localhost/",
+        data: {symbol: symbol},
+        success: function(data) {
+        var js_data = JSON.parse(data);
+        d = js_data; //TODO remove
+        //TODO icons
+        $('#stock-table-name').text(js_data['Name']);
+        $('#stock-table-symbol').text(js_data['Symbol']);
+        $('#stock-table-last-price').text('$ ' + js_data['LastPrice']);
+        var positive = Number(js_data['Change']) > 0;
+        var display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['Change'] + ' ( ' + js_data['ChangePercent'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
+        $('#stock-table-change-percent').html(display);
+        $('#stock-table-timestamp').text(js_data['Timestamp']);
+        $('#stock-table-market-cap').text(js_data['MarketCap']);
+        $('#stock-table-volume').text(js_data['Volume']);
+        positive = Number(js_data['ChangeYTD']) > 0;
+        display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['ChangeYTD'] + ' ( ' + js_data['ChangePercentYTD'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
+        $('#stock-table-change-ytd').html(display);
+        $('#stock-table-high-price').text('$ ' + js_data['High']);
+        $('#stock-table-low-price').text('$ ' + js_data['Low']);
+        $('#stock-table-opening-price').text('$ ' + js_data['Open']);
         }
+      });
 
-        function clearForm(f) {
-            // Clear the input box
-            document.getElementById('search_input').value = "";
-            //TODO clear any validation errors if necessary
-            // Move carousel back to favorites
-            $('#carousel-main').carousel(0);
+      // Yahoo daily stock chart API call
+      $('#stock-day-chart').html("<img src=https://chart.yahoo.com/t?s=" + symbol + "&lang=en-US&width=400&height=300></img>");
+    }
+
+    function doHistoricalCharts() {
+      selectDetailedNav('historical-charts-nav');
+      showDetailedDiv('historical-charts-div');
+      //TODO
+    }
+
+    function doNewsFeed() {
+      selectDetailedNav('news-feed-nav');
+      showDetailedDiv('news-feed-div');
+      //TODO
+
+      // Google news api call
+      $.ajax({
+        url: "http://localhost/",
+        data: {news: symbol},
+        success: function(data) {
+        //var js_data = JSON.parse(data);
+        news = data;//js_data;
         }
+      });
+    }
 
-        function toggleAutoRefresh() {
-            // Also clear the response area, as noted on Piazza
-            alert("TODO AutoRefresh is " + document.getElementById('auto-refresh-toggle').checked);
-        }
+    function makeFavorite() {
+      //TODO
+      alert('Favorite');
+    }
 
-        function refreshFavorites() {
-            //TODO refresh only the price and change columns
-            alert("TODO refresh favorites pushed.");
-        }
+    function facebookPost() {
+      //TODO
+      alert('Facebook');
+    }
 
-        function removeFavorite(symbol) {
-            //TODO remove from table and local storage
-            alert("TODO remove favorite pushed with symbol " + symbol + ".");
-        }
-
-        function selectDetailedNav(id) {
-            // Make all inactive
-            $('#current-stock-nav').removeClass('active');
-            $('#historical-charts-nav').removeClass('active');
-            $('#news-feed-nav').removeClass('active');
-            $('#' + id).addClass('active');
-        }
-
-        function doCurrentStock() {
-            selectDetailedNav('current-stock-nav');
-            // Populate table info
-            $.ajax({
-              url: "http://localhost/",
-              data: {symbol: symbol},
-              success: function(data) {
-                var js_data = JSON.parse(data);
-                d = js_data; //TODO remove
-                //TODO icons
-                $('#stock-table-name').text(js_data['Name']);
-                $('#stock-table-symbol').text(js_data['Symbol']);
-                $('#stock-table-last-price').text('$ ' + js_data['LastPrice']);
-                var positive = Number(js_data['Change']) > 0;
-                var display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['Change'] + ' ( ' + js_data['ChangePercent'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
-                $('#stock-table-change-percent').html(display);
-                $('#stock-table-timestamp').text(js_data['Timestamp']);
-                $('#stock-table-market-cap').text(js_data['MarketCap']);
-                $('#stock-table-volume').text(js_data['Volume']);
-                positive = Number(js_data['ChangeYTD']) > 0;
-                display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['ChangeYTD'] + ' ( ' + js_data['ChangePercentYTD'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
-                $('#stock-table-change-ytd').html(display);
-                $('#stock-table-high-price').text('$ ' + js_data['High']);
-                $('#stock-table-low-price').text('$ ' + js_data['Low']);
-                $('#stock-table-opening-price').text('$ ' + js_data['Open']);
-              }
-            });
-
-            // Yahoo daily stock chart API call
-            $('#stock-day-chart').html("<img src=https://chart.yahoo.com/t?s=" + symbol + "&lang=en-US&width=400&height=300></img>");
-        }
-
-        function doHistoricalCharts() {
-            selectDetailedNav('historical-charts-nav');
-            //TODO
-        }
-
-        function doNewsFeed() {
-            selectDetailedNav('news-feed-nav');
-            //TODO
-        }
-
-        function makeFavorite() {
-            //TODO
-            alert('Favorite');
-        }
-
-        function facebookPost() {
-            //TODO
-            alert('Facebook');
-        }
-
-    </script>
-    <script>
-
-  $(function() {
+    $(function() {
     $( "#search_input" ).autocomplete({
-      source: function( request, response ) {
-        // Since they're typing something, make sure the error text is hidden
-        $('#select-valid-error').hide();
-        $.ajax({
-          url: "http://localhost/",
-          data: {input: request.term},
-          success: function( data ) {
-            autocomplete_symbols = [];
-            autocomplete_symbol_lookup = [];
-            var autocomplete_display = [];
-            var js_data = JSON.parse(data);
-            for (var i = 0; i < js_data.length; i++) {
-                autocomplete_symbols[js_data[i]['Symbol']] = true;
-                autocomplete_symbol_lookup[js_data[i]['Display']] = js_data[i]['Symbol'];
-                autocomplete_display.push(js_data[i]['Display']);
-            }
-            response(autocomplete_display);
+      source: function(request, response) {
+      // Since they're typing something, make sure the error text is hidden
+      $('#select-valid-error').hide();
+      $.ajax({
+        url: "http://localhost/",
+        data: {input: request.term},
+        success: function( data ) {
+          autocomplete_symbols = [];
+          autocomplete_symbol_lookup = [];
+          var autocomplete_display = [];
+          var js_data = JSON.parse(data);
+          for (var i = 0; i < js_data.length; i++) {
+            autocomplete_symbols[js_data[i]['Symbol']] = true;
+            autocomplete_symbol_lookup[js_data[i]['Display']] = js_data[i]['Symbol'];
+            autocomplete_display.push(js_data[i]['Display']);
           }
-        });
+          response(autocomplete_display);
+        }
+      });
       },
       minLength: 1,
-      select: function( event, ui ) {
+      select: function(event, ui) {
         if (ui.item) {
-            document.getElementById('search_input').value = autocomplete_symbol_lookup[ui.item.label];
-            return false;
+          document.getElementById('search_input').value = autocomplete_symbol_lookup[ui.item.label];
+          return false;
         }
       },
       open: function() {
-        $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
+        $(this).removeClass("ui-corner-all").addClass("ui-corner-top");
       },
       close: function() {
-        $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
+        $(this).removeClass("ui-corner-top").addClass("ui-corner-all");
       }
     });
-  });
+    });
   </script>
 </head>
 <body class="align-center">
-    <div class="container_panel panel panel-default partial-width align-center">
-        <div class="padding-16">
-            <div class="row">
-                <div class="align-center col-sm-12 padding-t-16">
-                    <label class="">Stock Market Search</label>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-3">
-                    <label for="search_input" class="control-label">Enter the stock name or symbol<span class="red">*</span></label>
-                </div>
-                <div class="col-sm-6">
-                    <input type="text" class="form-control" id="search_input" placeholder="Apple Inc or AAPL" REQUIRED pattern=".*[^\s]+.*" onInvalid="setCustomValidity('Please fill out this field.')" onKeyUp="try{setCustomValidity('')}catch(e){}">
-                    <div id="log"></div>
-                </div>
-                <div class="col-sm-3">
-                    <button type="button" class="btn btn-primary" onClick="submitSearch()"><span class="glyphicon glyphicon-search"></span> Get Quote</button>
-                    <button type="button" class="btn btn-default" onClick="clearForm()"><span class="glyphicon glyphicon-refresh"></span> Clear</button>
-                </div>
-            </div>
-            <div class="row padding-t-16">
-                <div class="col-sm-3"></div>
-                <div class="col-sm-6">
-                    <span class="red align-left" id="select-valid-error" hidden><small>Select a valid entry</small></span>
-                </div>
-                <div class="col-sm-3">
-                    <span>Powered By:</span><img src="mod-logo.png" width="120" height="24"></img>
-                </div>
-            </div>
+  <div class="container_panel panel panel-default partial-width align-center">
+    <div class="padding-16">
+      <div class="row">
+        <div class="align-center col-sm-12 padding-t-16">
+          <label class="">Stock Market Search</label>
         </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-3">
+          <label for="search_input" class="control-label">Enter the stock name or symbol<span class="red">*</span></label>
+        </div>
+        <div class="col-sm-6">
+          <input type="text" class="form-control" id="search_input" placeholder="Apple Inc or AAPL" REQUIRED pattern=".*[^\s]+.*" onInvalid="setCustomValidity('Please fill out this field.')" onKeyUp="try{setCustomValidity('')}catch(e){}">
+          <div id="log"></div>
+        </div>
+        <div class="col-sm-3">
+          <button type="button" class="btn btn-primary" onClick="submitSearch()"><span class="glyphicon glyphicon-search"></span> Get Quote</button>
+          <button type="button" class="btn btn-default" onClick="clearForm()"><span class="glyphicon glyphicon-refresh"></span> Clear</button>
+        </div>
+      </div>
+      <div class="row padding-t-16">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-6">
+          <span class="red align-left" id="select-valid-error" hidden><small>Select a valid entry</small></span>
+        </div>
+        <div class="col-sm-3">
+          <span>Powered By:</span><img src="mod-logo.png" width="120" height="24"></img>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <hr class="align-center partial-width margin-tb-16">
+  <hr class="align-center partial-width margin-tb-16">
 
-    <div id="carousel-main" class="carousel slide">
-        <div class="carousel-inner">
+  <div id="carousel-main" class="carousel slide">
+    <div class="carousel-inner">
 
-            <div class="item active">
-                <div class="container_panel panel panel-default partial-width align-center padding-16">
-                    <div class="panel panel-default">
-                        <div class="panel-heading gray-gradient no-bottom">
-                            <span class="row favorite-list-header">
-                                <span class="col-sm-2">
-                                    <label class="control-label align-left">Favorite List</label>
-                                </span>
-                                <span class="col-sm-5"></span>
-                                <span class="col-sm-5 align-right">
-                                    <span>Automatic Refresh:</span>
-                                    <input id="auto-refresh-toggle" type="checkbox" data-toggle="toggle" data-size="normal" onChange="toggleAutoRefresh()" list="autocomplete-matches">
-                                    <datalist id="autocomplete-matches"></datalist>
-                                    <button type="button" class="btn btn-default" onClick="refreshFavorites()"><span class="glyphicon glyphicon-refresh"></span></button>
-                                    <button type="button" class="btn btn-default" href="#carousel-main" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></button>
-                                </span>
-
-                            </span>
-                        </div>
-                        <div class="panel-body">
-                            <div class="table-responsive">
-                                <table class="table table-striped no-bottom">
-                                    <tr>
-                                        <th>Symbol</th>
-                                        <th>Company Name</th>
-                                        <th>Stock Price</th>
-                                        <th>Change (Percent Change)</th>
-                                        <th>Market Cap</th>
-                                        <th></th>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-left">Dummy data</td>
-                                        <td class="text-left">Company Name</td>
-                                        <td class="text-left">Stock Price</td>
-                                        <td class="text-left">Change (Percent Change)</td>
-                                        <td class="text-left">Market Cap</td>
-                                        <td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite('<first>')"><span class="glyphicon glyphicon-trash"></span></button></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-left">Symbol</td>
-                                        <td class="text-left">Company Name</td>
-                                        <td class="text-left">Stock Price</td>
-                                        <td class="text-left">Change (Percent Change)</td>
-                                        <td class="text-left">Market Cap</td>
-                                        <td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite('<second>')"><span class="glyphicon glyphicon-trash"></span></button></td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="item">
-                <div class="container_panel panel panel-default partial-width align-center padding-16">
-                    <div class="panel panel-default">
-                        <div class="panel-heading gray-gradient no-bottom">
-                            <span class="row favorite-list-header">
-                                <span class="col-sm-1 align-left">
-                                    <button type="button" class="btn btn-default" href="#carousel-main" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></button>
-                                </span>
-                                <span class="col-sm-11">
-                                    <label class="control-label align-center">Stock Details</label>
-                                </span>
-                            </span>
-                        </div>
-                        <div class="panel-body margin-8">
-                        <ul class="nav nav-pills">
-                          <li id="current-stock-nav" class="active"><a onClick="doCurrentStock()"><span class="glyphicon glyphicon-dashboard"></span> Current Stock</a></li>
-                          <li id="historical-charts-nav"><a onClick="doHistoricalCharts()"><span class="glyphicon glyphicon-stats"></span> Historical Charts</a></li>
-                          <li id="news-feed-nav"><a onClick="doNewsFeed()"><span class="glyphicon glyphicon-link"></span> News Feeds</a></li>
-                        </ul>
-                        <hr>
-                        <div class="row" id="current-stock-div">
-                  <div class="col-sm-6 ">
-                            <div class="table-responsive">
-                                <table class="table table-striped no-bottom">
-                                <thead>
-                                    <tr>
-                                        <th colspan="2">Stock Details</th>
-                                    </tr>
-                            </thead>
-                            <tbody>
-                                    <tr>
-                                        <th class="text-left">Name</th>
-                                        <td class="text-left" id="stock-table-name"></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="text-left">Symbol</th>
-                                        <td class="text-left" id="stock-table-symbol"></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="text-left">Last Price</th>
-                                        <td class="text-left" id="stock-table-last-price"></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="text-left">Change (Change Percent)</th>
-                                        <td class="text-left" id="stock-table-change-percent"></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="text-left">Time and Date</th>
-                                        <td class="text-left" id="stock-table-timestamp"></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="text-left">Market Cap</th>
-                                        <td class="text-left" id="stock-table-market-cap"></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="text-left">Volume</th>
-                                        <td class="text-left" id="stock-table-volume"></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="text-left">Change YTD (Change Percent YTD)</th>
-                                        <td class="text-left" id="stock-table-change-ytd"></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="text-left">High Price</th>
-                                        <td class="text-left" id="stock-table-high-price"></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="text-left">Low Price</th>
-                                        <td class="text-left" id="stock-table-low-price"></td>
-                                    </tr>
-                                    <tr>
-                                        <th class="text-left">Opening Price</th>
-                                        <td class="text-left" id="stock-table-opening-price"></td>
-                                    </tr>
-                            </tbody>
-                                </table>
-                            </div>
-            </div>
-            <div class="col-sm-6">
-                <span class="align-right">
-                    <button type="button" class="btn btn-default" onClick="clearForm()"><span class="glyphicon glyphicon-refresh"></span> Clear</button>
-                    <button type="button" class="btn btn-default" onClick="clearForm()"><span class="glyphicon glyphicon-refresh"></span> Clear</button>
+      <div class="item active">
+        <div class="container_panel panel panel-default partial-width align-center padding-16">
+          <div class="panel panel-default">
+            <div class="panel-heading gray-gradient no-bottom">
+              <span class="row favorite-list-header">
+                <span class="col-sm-2">
+                  <label class="control-label align-left">Favorite List</label>
                 </span>
-                <div id="stock-day-chart"></div>
-            </div>
+                <span class="col-sm-5"></span>
+                <span class="col-sm-5 align-right">
+                  <span>Automatic Refresh:</span>
+                  <input id="auto-refresh-toggle" type="checkbox" data-toggle="toggle" data-size="normal" onChange="toggleAutoRefresh()" list="autocomplete-matches">
+                  <datalist id="autocomplete-matches"></datalist>
+                  <button type="button" class="btn btn-default" onClick="refreshFavorites()"><span class="glyphicon glyphicon-refresh"></span></button>
+                  <button type="button" class="btn btn-default" href="#carousel-main" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></button>
+                </span>
 
-                        </div>
-                        </div>
-                    </div>
-                </div>
+              </span>
             </div>
+            <div class="panel-body">
+              <div class="table-responsive">
+                <table class="table table-striped no-bottom">
+                  <tr>
+                    <th>Symbol</th>
+                    <th>Company Name</th>
+                    <th>Stock Price</th>
+                    <th>Change (Percent Change)</th>
+                    <th>Market Cap</th>
+                    <th></th>
+                  </tr>
+                  <tr>
+                    <td class="text-left">Dummy data</td>
+                    <td class="text-left">Company Name</td>
+                    <td class="text-left">Stock Price</td>
+                    <td class="text-left">Change (Percent Change)</td>
+                    <td class="text-left">Market Cap</td>
+                    <td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite('<first>')"><span class="glyphicon glyphicon-trash"></span></button></td>
+                  </tr>
+                  <tr>
+                    <td class="text-left">Symbol</td>
+                    <td class="text-left">Company Name</td>
+                    <td class="text-left">Stock Price</td>
+                    <td class="text-left">Change (Percent Change)</td>
+                    <td class="text-left">Market Cap</td>
+                    <td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite('<second>')"><span class="glyphicon glyphicon-trash"></span></button></td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
         </div>
-    </div>
-    <script src="js/bootstrap.min.js"></script>
-    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
-    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+      </div>
 
-    <script>
-        // Prevent carousel from changing automatically
-        $('#carousel-main').carousel({
-            interval: false
-        })
-        //TODO temp for faster viewing
-        $('#carousel-main').carousel(1);
-        doCurrentStock();
-    </script>
+      <div class="item">
+        <div class="container_panel panel panel-default partial-width align-center padding-16">
+          <div class="panel panel-default">
+            <div class="panel-heading gray-gradient no-bottom">
+              <span class="row favorite-list-header">
+                <span class="col-sm-1 align-left">
+                  <button type="button" class="btn btn-default" href="#carousel-main" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></button>
+                </span>
+                <span class="col-sm-11">
+                  <label class="control-label align-center">Stock Details</label>
+                </span>
+              </span>
+            </div>
+            <div class="panel-body margin-8">
+              <ul class="nav nav-pills">
+                <li id="current-stock-nav" class="active"><a onClick="doCurrentStock()"><span class="glyphicon glyphicon-dashboard"></span> Current Stock</a></li>
+                <li id="historical-charts-nav"><a onClick="doHistoricalCharts()"><span class="glyphicon glyphicon-stats"></span> Historical Charts</a></li>
+                <li id="news-feed-nav"><a onClick="doNewsFeed()"><span class="glyphicon glyphicon-link"></span> News Feeds</a></li>
+              </ul>
+              <hr>
+              <div class="row" id="current-stock-div">
+                <div class="col-sm-6 ">
+                  <div class="table-responsive">
+                    <table class="table table-striped no-bottom">
+                      <thead>
+                        <tr>
+                          <th colspan="2">Stock Details</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th class="text-left">Name</th>
+                          <td class="text-left" id="stock-table-name"></td>
+                        </tr>
+                        <tr>
+                          <th class="text-left">Symbol</th>
+                          <td class="text-left" id="stock-table-symbol"></td>
+                        </tr>
+                        <tr>
+                          <th class="text-left">Last Price</th>
+                          <td class="text-left" id="stock-table-last-price"></td>
+                        </tr>
+                        <tr>
+                          <th class="text-left">Change (Change Percent)</th>
+                          <td class="text-left" id="stock-table-change-percent"></td>
+                        </tr>
+                        <tr>
+                          <th class="text-left">Time and Date</th>
+                          <td class="text-left" id="stock-table-timestamp"></td>
+                        </tr>
+                        <tr>
+                          <th class="text-left">Market Cap</th>
+                          <td class="text-left" id="stock-table-market-cap"></td>
+                        </tr>
+                        <tr>
+                          <th class="text-left">Volume</th>
+                          <td class="text-left" id="stock-table-volume"></td>
+                        </tr>
+                        <tr>
+                          <th class="text-left">Change YTD (Change Percent YTD)</th>
+                          <td class="text-left" id="stock-table-change-ytd"></td>
+                        </tr>
+                        <tr>
+                          <th class="text-left">High Price</th>
+                          <td class="text-left" id="stock-table-high-price"></td>
+                        </tr>
+                        <tr>
+                          <th class="text-left">Low Price</th>
+                          <td class="text-left" id="stock-table-low-price"></td>
+                        </tr>
+                        <tr>
+                          <th class="text-left">Opening Price</th>
+                          <td class="text-left" id="stock-table-opening-price"></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <span class="align-right">
+                    <button type="button" class="btn btn-default" onClick="facebookPost()"><span class="glyphicon glyphicon-star"></span></button>
+                    <button type="button" class="btn btn-default" onClick="makeFavorite()">F</button>
+                  </span>
+                  <div id="stock-day-chart"></div>
+                </div>
+
+              </div>
+              <div class="row" id="historical-charts-div" hidden>
+                Historical charts
+              </div>
+              <div class="row" id="news-feed-div" hidden>
+                News feed
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="js/bootstrap.min.js"></script>
+  <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+  <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+
+  <script>
+    // Prevent carousel from changing automatically
+    $('#carousel-main').carousel({
+      interval: false
+    })
+    //TODO temp for faster viewing
+    $('#carousel-main').carousel(1);
+    doCurrentStock();
+  </script>
 </body>
 </html>
