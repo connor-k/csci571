@@ -13,6 +13,32 @@
     // The current stock to display in the details section
     symbol = "AAPL"; //TODO remove
 
+    function chartFixDate(dateIn) {
+      var dat = new Date(dateIn);
+      return Date.UTC(dat.getFullYear(), dat.getMonth(), dat.getDate());
+    };
+
+    function chartGetOHLC(json) {
+      var dates = json.Dates || [];
+      var elements = json.Elements || [];
+      var chartSeries = [];
+
+      if (elements[0]) {
+        for (var i = 0, datLen = dates.length; i < datLen; i++) {
+          var dat = chartFixDate(dates[i]);
+          var pointData = [
+            dat,
+            elements[0].DataSeries['open'].values[i],
+            elements[0].DataSeries['high'].values[i],
+            elements[0].DataSeries['low'].values[i],
+            elements[0].DataSeries['close'].values[i]
+          ];
+          chartSeries.push(pointData);
+        };
+      }
+      return chartSeries;
+    };
+
     function updateAPIData() {
       // Current Stock data
       $.ajax({
@@ -43,6 +69,59 @@
       // Yahoo daily stock chart API call
       $('#stock-day-chart').html("<img src=https://chart.yahoo.com/t?s=" + symbol + "&lang=en-US&width=400&height=300></img>");
 
+      // Chart data
+      $.ajax({
+        url: "http://localhost/",
+        data: {chart: symbol},
+        success: function(data) {
+          var js_data = JSON.parse(data);
+          $('#chart-container').highcharts('StockChart', {
+            rangeSelector : {
+              selected : 0,
+              inputEnabled : false
+            },
+
+            title : {
+              text : symbol + ' Stock Value'
+            },
+
+            navigation : {
+              buttonOptions : {
+                enabled: false
+              }
+            },
+
+            yAxis : {
+              title : {
+                text: "Stock Value"
+              }
+            },
+
+            series : [{
+              name : symbol,
+              data : chartGetOHLC(js_data),
+              type : 'area',
+              threshold : null,
+              tooltip : {
+                valueDecimals : 2
+              },
+              fillColor : {
+                linearGradient : {
+                  x1: 0,
+                  y1: 0,
+                  x2: 0,
+                  y2: 1
+                },
+                stops : [
+                [0, Highcharts.getOptions().colors[0]],
+                [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                ]
+              }
+            }]
+          });
+        },
+      });
+
       // News data
       $.ajax({
         url: "http://localhost/",
@@ -66,7 +145,6 @@
             }
             $('#news-feed-div').html(feed);
           } catch (e) {
-            alert(e);
             $('#news-feed-div').html('<p>Note: Google News Feed QPS Exceeded</p>');
           }
         }
@@ -134,7 +212,8 @@
     function doHistoricalCharts() {
       selectDetailedNav('historical-charts-nav');
       showDetailedDiv('historical-charts-div');
-      //TODO
+      // Workaround for the chart initially not filling the whole width
+      window.dispatchEvent(new Event('resize'));
     }
 
     function doNewsFeed() {
@@ -384,68 +463,11 @@
   <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
   <script src="https://code.highcharts.com/stock/highstock.js"></script>
   <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
-
-
-
-
   <script>
-  $(function () {
-    $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=aapl-c.json&callback=?', function (data) {
-
-        // Create the chart
-        $('#chart-container').highcharts('StockChart', {
-            rangeSelector : {
-                selected : 0,
-                inputEnabled : false
-            },
-
-            title : {
-                text : symbol + ' Stock Value'
-            },
-
-            navigation : {
-              buttonOptions : {
-                enabled: false
-              }
-            },
-
-            yAxis : {
-              title : {
-                text: "Stock Value"
-              }
-            },
-
-            series : [{
-                name : symbol,
-                data : data,
-                type : 'area',
-                threshold : null,
-                tooltip : {
-                    valueDecimals : 2
-                },
-                fillColor : {
-                    linearGradient : {
-                        x1: 0,
-                        y1: 0,
-                        x2: 0,
-                        y2: 1
-                    },
-                    stops : [
-                        [0, Highcharts.getOptions().colors[0]],
-                        [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-                    ]
-                }
-            }]
-        });
-    });
-});
     // Prevent carousel from changing automatically
     $('#carousel-main').carousel({
       interval: false
     })
-    //TODO temp for faster viewing
-    $('#carousel-main').carousel(1);
-    doCurrentStock();
   </script>
 </body>
 </html>
