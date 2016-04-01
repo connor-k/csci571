@@ -2,6 +2,7 @@
     define('ACTION_LOOKUP', 'input');
     define('ACTION_QUOTE', 'symbol');
     define('ACTION_NEWS', 'news');
+    define('ACTION_CHART', 'chart');
 
     if (isset($_GET[ACTION_LOOKUP])) {
         $lookup_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/Lookup/json?input=';
@@ -71,6 +72,12 @@
         $news_endurl = '&userip=128.9.112.1'; //TODO change ip?
         $input = urlencode(htmlspecialchars(trim($_GET[ACTION_NEWS])));
         $response = @file_get_contents($news_baseurl.$input.$news_endurl);
+        printf("%s", $response);
+    } else if (isset($_GET[ACTION_CHART])) {
+        $chart_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/InteractiveChart/json?parameters=%7b%22Normalized%22:false,%22NumberOfDays%22:1095,%22DataPeriod%22:%22Day%22,%22Elements%22:%5b%7b%22Symbol%22:%22';
+        $chart_endurl = '%22,%22Type%22:%22price%22,%22Params%22:%5b%22ohlc%22%5d%7d%5d%7d';
+        $input = $_GET[ACTION_CHART];
+        $response = @file_get_contents($chart_baseurl.$input.$chart_endurl);
         printf("%s", $response);
     }
 ?>

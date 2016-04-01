@@ -370,7 +370,7 @@
 
               </div>
               <div class="row" id="historical-charts-div" hidden>
-                Historical charts
+                <div id="chart-container" class="align-center margin-16"></div>
               </div>
               <div class="row" id="news-feed-div" hidden></div>
             </div>
@@ -382,8 +382,63 @@
   <script src="js/bootstrap.min.js"></script>
   <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
   <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+  <script src="https://code.highcharts.com/stock/highstock.js"></script>
+  <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+
+
+
 
   <script>
+  $(function () {
+    $.getJSON('https://www.highcharts.com/samples/data/jsonp.php?filename=aapl-c.json&callback=?', function (data) {
+
+        // Create the chart
+        $('#chart-container').highcharts('StockChart', {
+            rangeSelector : {
+                selected : 0,
+                inputEnabled : false
+            },
+
+            title : {
+                text : symbol + ' Stock Value'
+            },
+
+            navigation : {
+              buttonOptions : {
+                enabled: false
+              }
+            },
+
+            yAxis : {
+              title : {
+                text: "Stock Value"
+              }
+            },
+
+            series : [{
+                name : symbol,
+                data : data,
+                type : 'area',
+                threshold : null,
+                tooltip : {
+                    valueDecimals : 2
+                },
+                fillColor : {
+                    linearGradient : {
+                        x1: 0,
+                        y1: 0,
+                        x2: 0,
+                        y2: 1
+                    },
+                    stops : [
+                        [0, Highcharts.getOptions().colors[0]],
+                        [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                    ]
+                }
+            }]
+        });
+    });
+});
     // Prevent carousel from changing automatically
     $('#carousel-main').carousel({
       interval: false
