@@ -77,6 +77,33 @@
           var js_data = JSON.parse(data);
           $('#chart-container').highcharts('StockChart', {
             rangeSelector : {
+              buttons: [
+                {type: 'week',
+                  count: 1,
+                  text: '1w'
+                }, {
+                  type: 'month',
+                  count: 1,
+                  text: '1m'
+                }, {
+                  type: 'month',
+                  count: 3,
+                  text: '3m'
+                }, {
+                  type: 'month',
+                  count: 6,
+                  text: '6m'
+                }, {
+                  type: 'ytd',
+                  text: 'YTD'
+                }, {
+                  type: 'year',
+                  count: 1,
+                  text: '1y'
+                }, {
+                  type: 'all',
+                  text: 'All'
+              }],
               selected : 0,
               inputEnabled : false
             },
@@ -98,12 +125,13 @@
             },
 
             series : [{
-              name : symbol,
+              name : symbol + ': $',
               data : chartGetOHLC(js_data),
               type : 'area',
               threshold : null,
               tooltip : {
-                valueDecimals : 2
+                valueDecimals : 2,
+                valuePrefix : '$'
               },
               fillColor : {
                 linearGradient : {
