@@ -45,24 +45,27 @@
         url: "http://localhost/",
         data: {symbol: symbol},
         success: function(data) {
-        var js_data = JSON.parse(data);
-        d = js_data; //TODO remove
-        //TODO icons
-        $('#stock-table-name').text(js_data['Name']);
-        $('#stock-table-symbol').text(js_data['Symbol']);
-        $('#stock-table-last-price').text('$ ' + js_data['LastPrice']);
-        var positive = Number(js_data['Change']) > 0;
-        var display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['Change'] + ' ( ' + js_data['ChangePercent'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
-        $('#stock-table-change-percent').html(display);
-        $('#stock-table-timestamp').text(js_data['Timestamp']);
-        $('#stock-table-market-cap').text(js_data['MarketCap']);
-        $('#stock-table-volume').text(js_data['Volume']);
-        positive = Number(js_data['ChangeYTD']) > 0;
-        display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['ChangeYTD'] + ' ( ' + js_data['ChangePercentYTD'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
-        $('#stock-table-change-ytd').html(display);
-        $('#stock-table-high-price').text('$ ' + js_data['High']);
-        $('#stock-table-low-price').text('$ ' + js_data['Low']);
-        $('#stock-table-opening-price').text('$ ' + js_data['Open']);
+          try {
+            var js_data = JSON.parse(data);
+            $('#stock-table-name').text(js_data['Name']);
+            $('#stock-table-symbol').text(js_data['Symbol']);
+            $('#stock-table-last-price').text('$ ' + js_data['LastPrice']);
+            var positive = Number(js_data['Change']) > 0;
+            var display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['Change'] + ' ( ' + js_data['ChangePercent'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
+            $('#stock-table-change-percent').html(display);
+            $('#stock-table-timestamp').text(js_data['Timestamp']);
+            $('#stock-table-market-cap').text(js_data['MarketCap']);
+            $('#stock-table-volume').text(js_data['Volume']);
+            positive = Number(js_data['ChangeYTD']) > 0;
+            display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['ChangeYTD'] + ' ( ' + js_data['ChangePercentYTD'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
+            $('#stock-table-change-ytd').html(display);
+            $('#stock-table-high-price').text('$ ' + js_data['High']);
+            $('#stock-table-low-price').text('$ ' + js_data['Low']);
+            $('#stock-table-opening-price').text('$ ' + js_data['Open']);
+          } catch (e) {
+            // Alert the API call was bad
+            alert('Note: Markit on Demand queries exceeded, please wait and try again.');
+          }
         }
       });
 
@@ -180,9 +183,17 @@
     }
 
     function submitSearch() {
+      // Run the validation to check that it's not blank
+      if (!$('#search_input')[0].checkValidity()) {
+        $('#search_input')[0].reportValidity();
+        return;
+      }
+
       // Check that the input matches a symbol from the lookup response
       symbol = document.getElementById('search_input').value.toUpperCase();
       if (autocomplete_symbols[symbol]) {
+        // Enable display button
+        $('#display-stock-info').prop('disabled', false);
         // Do the search
         $('#carousel-main').carousel(1);
         // Update data and show the current stock info page
@@ -196,7 +207,10 @@
     function clearForm(f) {
       // Clear the input box
       document.getElementById('search_input').value = "";
-      //TODO clear any validation errors if necessary
+      // Hide any error message
+      $('#select-valid-error').hide();
+      // Disable the detail button
+      $('#display-stock-info').prop('disabled', true);
       // Move carousel back to favorites
       $('#carousel-main').carousel(0);
     }
@@ -263,20 +277,29 @@
       source: function(request, response) {
       // Since they're typing something, make sure the error text is hidden
       $('#select-valid-error').hide();
-      $.ajax({
+      // Cancel a current request if there is one, since they typed again
+      if (typeof autocomplete_request !== 'undefined') {
+        autocomplete_request.abort();
+      }
+      autocomplete_request = $.ajax({
         url: "http://localhost/",
         data: {input: request.term},
         success: function( data ) {
           autocomplete_symbols = [];
           autocomplete_symbol_lookup = [];
           var autocomplete_display = [];
-          var js_data = JSON.parse(data);
-          for (var i = 0; i < js_data.length; i++) {
-            autocomplete_symbols[js_data[i]['Symbol']] = true;
-            autocomplete_symbol_lookup[js_data[i]['Display']] = js_data[i]['Symbol'];
-            autocomplete_display.push(js_data[i]['Display']);
+          try {
+            var js_data = JSON.parse(data);
+            for (var i = 0; i < js_data.length; i++) {
+              autocomplete_symbols[js_data[i]['Symbol']] = true;
+              autocomplete_symbol_lookup[js_data[i]['Display']] = js_data[i]['Symbol'];
+              autocomplete_display.push(js_data[i]['Display']);
+            }
+            response(autocomplete_display);
+          } catch(e) {
+            // No good results, clear it
+            response(null);
           }
-          response(autocomplete_display);
         }
       });
       },
@@ -324,7 +347,7 @@
           <span class="red align-left" id="select-valid-error" hidden><small>Select a valid entry</small></span>
         </div>
         <div class="col-sm-3">
-          <span>Powered By:</span><img src="mod-logo.png" width="120" height="24"></img>
+          <span>Powered By:</span><a href="http://dev.markitondemand.com/MODApis/" target="_blank"><img src="mod-logo.png" width="120" height="24"></img></a>
         </div>
       </div>
     </div>
@@ -349,7 +372,7 @@
                   <input id="auto-refresh-toggle" type="checkbox" data-toggle="toggle" data-size="normal" onChange="toggleAutoRefresh()" list="autocomplete-matches">
                   <datalist id="autocomplete-matches"></datalist>
                   <button type="button" class="btn btn-default" onClick="refreshFavorites()"><span class="glyphicon glyphicon-refresh"></span></button>
-                  <button type="button" class="btn btn-default" href="#carousel-main" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></button>
+                  <button type="button" class="btn btn-default" id="display-stock-info" href="#carousel-main" data-slide="next" disabled><span class="glyphicon glyphicon-chevron-right"></span></button>
                 </span>
 
               </span>
@@ -365,6 +388,7 @@
                     <th>Market Cap</th>
                     <th></th>
                   </tr>
+                  <!--
                   <tr>
                     <td class="text-left">Dummy data</td>
                     <td class="text-left">Company Name</td>
@@ -381,6 +405,7 @@
                     <td class="text-left">Market Cap</td>
                     <td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite('<second>')"><span class="glyphicon glyphicon-trash"></span></button></td>
                   </tr>
+                  -->
                 </table>
               </div>
             </div>
