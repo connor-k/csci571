@@ -270,7 +270,17 @@
 
     function facebookPost() {
       //TODO
-      alert('Facebook');
+      FB.ui({
+        method: 'share',
+        href: 'http://dev.markitondemand.com/MODApis/',
+      }, function(response){
+        if (response) {
+          alert('Posted Successfully');
+        } else {
+          alert('Not Posted');
+        }
+      });
+      return false;
     }
 
     $(function() {
@@ -322,6 +332,25 @@
   </script>
 </head>
 <body class="align-center">
+  <!-- Facebook SDK -->
+  <script>
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '923841947714790',
+        xfbml      : true,
+        version    : 'v2.5'
+      });
+    };
+
+    (function(d, s, id){
+       var js, fjs = d.getElementsByTagName(s)[0];
+       if (d.getElementById(id)) {return;}
+       js = d.createElement(s); js.id = id;
+       js.src = "//connect.facebook.net/en_US/sdk.js";
+       fjs.parentNode.insertBefore(js, fjs);
+     }(document, 'script', 'facebook-jssdk'));
+  </script>
+
   <div class="container_panel panel panel-default partial-width align-center">
     <div class="padding-16">
       <div class="row">
@@ -374,7 +403,7 @@
                     <input id="auto-refresh-toggle" type="checkbox" data-toggle="toggle" data-size="normal" onChange="toggleAutoRefresh()">
                   </span>
                   <button type="button" class="btn btn-default" onClick="refreshFavorites()" data-toggle="tooltip" data-placement="top" title="Refresh the prices of your favorite stocks"><span class="glyphicon glyphicon-refresh"></span></button>
-                  <button type="button" class="btn btn-default" id="display-stock-info" href="#carousel-main" data-slide="next" data-toggle="tooltip" data-placement="top" title="View stock information" disabled><span class="glyphicon glyphicon-chevron-right"></span></button>
+                  <button type="button" class="btn btn-default" id="display-stock-info" href="#carousel-main" data-slide="next" data-toggle="tooltip" data-placement="top" title="View stock information" ><span class="glyphicon glyphicon-chevron-right"></span></button>
                 </span>
 
               </span>
@@ -495,8 +524,8 @@
                 </div>
                 <div class="col-sm-6 align-right">
                   <span>
-                    <button type="button" class="btn btn-default" onClick="facebookPost()"><span class="glyphicon glyphicon-star"></span></button>
-                    <button type="button" class="btn btn-default" onClick="makeFavorite()">F</button>
+                    <a href="" onClick="javascript:return facebookPost()"><img src="fb.png"></img></a>
+                    <button type="button" class="btn btn-default" onClick="makeFavorite()"><span class="glyphicon glyphicon-star"></span></button>
                   </span>
                   <br>
                   <div id="stock-day-chart"></div>
