@@ -10,6 +10,7 @@
   <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
   <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
   <script src="js/bootstrap.min.js"></script>
+  <script src="js/moment.js"></script>
   <script lang="JavaScript">
     // The current stock to display in the details section
     symbol = "AAPL"; //TODO remove
@@ -56,7 +57,7 @@
             var positive = Number(js_data['Change']) > 0;
             var display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['Change'] + ' ( ' + js_data['ChangePercent'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
             $('#stock-table-change-percent').html(display);
-            $('#stock-table-timestamp').text(js_data['Timestamp']);
+            $('#stock-table-timestamp').text(moment(new Date(js_data['Timestamp'])).local().format('DD MMM YYYY, hh:mm:ss a'));
             $('#stock-table-market-cap').text(js_data['MarketCap']);
             $('#stock-table-volume').text(js_data['Volume']);
             positive = Number(js_data['ChangeYTD']) > 0;
@@ -525,7 +526,7 @@
                     <input id="auto-refresh-toggle" type="checkbox" data-toggle="toggle" data-size="normal" onChange="toggleAutoRefresh()">
                   </span>
                   <button type="button" class="btn btn-default" onClick="refreshFavorites()" data-toggle="tooltip" data-placement="top" title="Refresh the prices of your favorite stocks"><span class="glyphicon glyphicon-refresh"></span></button>
-                  <button type="button" class="btn btn-default" id="display-stock-info" href="#carousel-main" data-slide="next" data-toggle="tooltip" data-placement="top" title="View stock information" ><span class="glyphicon glyphicon-chevron-right"></span></button>
+                  <button type="button" class="btn btn-default" id="display-stock-info" href="#carousel-main" data-slide="next" data-toggle="tooltip" data-placement="top" title="View stock information" disabled><span class="glyphicon glyphicon-chevron-right"></span></button>
                 </span>
 
               </span>
