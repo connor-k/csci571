@@ -14,6 +14,7 @@
     // The current stock to display in the details section
     symbol = "AAPL"; //TODO remove
     favorites_list = [];
+    autorefresh = false;
 
     function chartFixDate(dateIn) {
       var dat = new Date(dateIn);
@@ -234,13 +235,21 @@
     }
 
     function toggleAutoRefresh() {
-      // Also clear the response area, as noted on Piazza
-      alert("TODO AutoRefresh is " + document.getElementById('auto-refresh-toggle').checked);
+      autorefresh = document.getElementById('auto-refresh-toggle').checked;
+      if (autorefresh) {
+        autorefresh_interval = window.setInterval(function(){
+          refreshFavorites();
+        }, 5000);
+      } else {
+        window.clearInterval(autorefresh_interval);
+      }
     }
 
     function refreshFavorites() {
-      //TODO refresh only the price and change columns
-      alert("TODO refresh favorites pushed.");
+      // Refresh only the price and change columns (false flag to update)
+      for (var i = 0; i < favorites_list.length; i++) {
+        updateFavorite(favorites_list[i], false);
+      }
     }
 
     function selectDetailedNav(id) {
@@ -330,11 +339,11 @@
         html += '</td><td class="text-left" id="favorites-cap-' + favorites_list[i] + '">';
         html += '</td><td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite(\'' + favorites_list[i] + '\')"><span class="glyphicon glyphicon-trash"></span></button></td></tr>';
       }
+      $('#favorite-table').html(html);
       // Populate
       for (var i = 0; i < favorites_list.length; i++) {
         updateFavorite(favorites_list[i], true);
       }
-      $('#favorite-table').html(html);
     }
 
     function removeFavorite(s) {
