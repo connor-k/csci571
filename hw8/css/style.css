@@ -9,6 +9,22 @@ hr {
     margin-bottom: 16px;
 }
 
+@media only screen and (min-width:0px) and (max-width:750px)
+{
+    .hide-mobile {
+        display: none;
+        visibility: hidden;
+    }
+
+    .mobile-align-left {
+        text-align: left;
+        float: left;
+        clear: left;
+        margin-top: 8px;
+        margin-bottom: 8px;
+    }
+}
+
 .align-center {
     text-align: center;
     margin: 0 auto;
