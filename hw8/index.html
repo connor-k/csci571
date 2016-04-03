@@ -13,6 +13,7 @@
   <script lang="JavaScript">
     // The current stock to display in the details section
     symbol = "AAPL"; //TODO remove
+    favorites_list = [];
 
     function chartFixDate(dateIn) {
       var dat = new Date(dateIn);
@@ -78,79 +79,83 @@
         url: "http://localhost/",
         data: {chart: symbol},
         success: function(data) {
-          var js_data = JSON.parse(data);
-          $('#chart-container').highcharts('StockChart', {
-            rangeSelector : {
-              buttons: [
-                {type: 'week',
-                  count: 1,
-                  text: '1w'
-                }, {
-                  type: 'month',
-                  count: 1,
-                  text: '1m'
-                }, {
-                  type: 'month',
-                  count: 3,
-                  text: '3m'
-                }, {
-                  type: 'month',
-                  count: 6,
-                  text: '6m'
-                }, {
-                  type: 'ytd',
-                  text: 'YTD'
-                }, {
-                  type: 'year',
-                  count: 1,
-                  text: '1y'
-                }, {
-                  type: 'all',
-                  text: 'All'
-              }],
-              selected : 0,
-              inputEnabled : false
-            },
-
-            title : {
-              text : symbol + ' Stock Value'
-            },
-
-            navigation : {
-              buttonOptions : {
-                enabled: false
-              }
-            },
-
-            yAxis : {
-              title : {
-                text: "Stock Value"
-              }
-            },
-
-            series : [{
-              name : symbol + ': $',
-              data : chartGetOHLC(js_data),
-              type : 'area',
-              threshold : null,
-              tooltip : {
-                valueDecimals : 2,
-                valuePrefix : '$'
+          try {
+            var js_data = JSON.parse(data);
+            $('#chart-container').highcharts('StockChart', {
+              rangeSelector : {
+                buttons: [
+                  {type: 'week',
+                    count: 1,
+                    text: '1w'
+                  }, {
+                    type: 'month',
+                    count: 1,
+                    text: '1m'
+                  }, {
+                    type: 'month',
+                    count: 3,
+                    text: '3m'
+                  }, {
+                    type: 'month',
+                    count: 6,
+                    text: '6m'
+                  }, {
+                    type: 'ytd',
+                    text: 'YTD'
+                  }, {
+                    type: 'year',
+                    count: 1,
+                    text: '1y'
+                  }, {
+                    type: 'all',
+                    text: 'All'
+                }],
+                selected : 0,
+                inputEnabled : false
               },
-              fillColor : {
-                linearGradient : {
-                  x1: 0,
-                  y1: 0,
-                  x2: 0,
-                  y2: 1
+
+              title : {
+                text : symbol + ' Stock Value'
+              },
+
+              navigation : {
+                buttonOptions : {
+                  enabled: false
+                }
+              },
+
+              yAxis : {
+                title : {
+                  text: "Stock Value"
+                }
+              },
+
+              series : [{
+                name : symbol + ': $',
+                data : chartGetOHLC(js_data),
+                type : 'area',
+                threshold : null,
+                tooltip : {
+                  valueDecimals : 2,
+                  valuePrefix : '$'
                 },
-                stops : [
-                [0, Highcharts.getOptions().colors[0]],
-                [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-                ]
-              }
-            }]
-          });
+                fillColor : {
+                  linearGradient : {
+                    x1: 0,
+                    y1: 0,
+                    x2: 0,
+                    y2: 1
+                  },
+                  stops : [
+                  [0, Highcharts.getOptions().colors[0]],
+                  [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                  ]
+                }
+              }]
+            });
+          } catch (e) {
+            alert('Note: Markit on Demand queries exceeded, please wait and try again.');
+          }
         },
       });
 
@@ -181,6 +186,18 @@
           }
         }
       });
+
+      // Update favorite button with the proper style
+      if (isFavorite(symbol)) {
+        $('#favorite-star-icon').removeClass('glyphicon-star-empty');
+        $('#favorite-star-icon').addClass('glyphicon-star');
+        $('#favorite-star-icon').css('color', '#FFFB38');
+      } else {
+        $('#favorite-star-icon').removeClass('glyphicon-star');
+        $('#favorite-star-icon').addClass('glyphicon-star-empty');
+        $('#favorite-star-icon').css('color', '#FFFFFF');
+      }
+
     }
 
     function submitSearch() {
@@ -226,11 +243,6 @@
       alert("TODO refresh favorites pushed.");
     }
 
-    function removeFavorite(symbol) {
-      //TODO remove from table and local storage
-      alert("TODO remove favorite pushed with symbol " + symbol + ".");
-    }
-
     function selectDetailedNav(id) {
       $('#current-stock-nav').removeClass('active');
       $('#historical-charts-nav').removeClass('active');
@@ -263,13 +275,123 @@
       showDetailedDiv('news-feed-div');
     }
 
-    function makeFavorite() {
-      //TODO
-      alert('Favorite');
+    function isFavorite(s) {
+      return favorites_list.indexOf(s) != -1;
+    }
+
+    function updateFavorite(s, all) {
+      if (isFavorite(s)) {
+        // Get the stock data
+        $.ajax({
+          url: "http://localhost/",
+          data: {symbol: s},
+          success: function(data) {
+            try {
+              var js_data = JSON.parse(data);
+              if (all) {
+                $('#favorites-name-' + s).text(js_data['Name']);
+                $('#favorites-cap-' + s).text(js_data['MarketCap']);
+              }
+              // Always update price and change
+              $('#favorites-price-' + s).text('$ ' + js_data['LastPrice']);
+              var positive = Number(js_data['Change']) > 0;
+              var display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['Change'] + ' ( ' + js_data['ChangePercent'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
+              $('#favorites-change-' + s).html(display);
+            } catch (e) {
+              // Alert the API call was bad
+              alert('Note: Markit on Demand queries exceeded, please wait and try again.');
+            }
+          }
+        });
+      }
+    }
+
+    function favoriteClick(s) {
+      symbol = s;
+      // Enable display button
+      $('#display-stock-info').prop('disabled', false);
+      // Update data and show the current stock info page
+      updateAPIData();
+      $('#carousel-main').carousel(1);
+      // To stop link from refreshing
+      return false;
+    }
+
+    function loadFavorites() {
+      favorites_list = JSON.parse(localStorage.getItem('favorites'));
+      var html = '<tr><th>Symbol</th><th>Company Name</th><th>Stock Price</th><th>Change (Percent Change)</th><th>Market Cap</th><th></th></tr>';
+      // Generate html
+      for (var i = 0; i < favorites_list.length; i++) {
+        html += '<tr id="favorites-row-' + favorites_list[i] + '"><td class="text-left">';
+        html += '<a href="" onClick="javascript:return favoriteClick(\'' + favorites_list[i] + '\')">' + favorites_list[i] + '</a>';
+        html += '</td><td class="text-left" id="favorites-name-' + favorites_list[i] + '">';
+        html += 'loading name...';
+        html += '</td><td class="text-left" id="favorites-price-' + favorites_list[i] + '">';
+        html += 'loading price...';
+        html += '</td><td class="text-left" id="favorites-change-' + favorites_list[i] + '">';
+        html += 'loading change...';
+        html += '</td><td class="text-left" id="favorites-cap-' + favorites_list[i] + '">';
+        html += 'loading cap...';
+        html += '</td><td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite(\'' + favorites_list[i] + '\')"><span class="glyphicon glyphicon-trash"></span></button></td></tr>';
+      }
+      // Populate
+      for (var i = 0; i < favorites_list.length; i++) {
+        updateFavorite(favorites_list[i], true);
+      }
+      $('#favorite-table').html(html);
+    }
+
+    function removeFavorite(s) {
+      var index = favorites_list.indexOf(s);
+      if (index != -1) {
+        favorites_list.splice(index, 1);
+        localStorage.setItem('favorites', JSON.stringify(favorites_list));
+        $('#favorites-row-' + s).remove();
+        // Update details section star button if this was the selected stock
+        if (symbol == s) {
+          $('#favorite-star-icon').removeClass('glyphicon-star');
+          $('#favorite-star-icon').addClass('glyphicon-star-empty');
+          $('#favorite-star-icon').css('color', '#FFFFFF');
+        }
+      }
+    }
+
+    function addFavorite() {
+      if (!isFavorite(symbol)) {
+        favorites_list.push(symbol.toUpperCase());
+        localStorage.setItem('favorites', JSON.stringify(favorites_list));
+        // Add this one element
+        var html = '';
+        html += '<tr id="favorites-row-' + symbol + '"><td class="text-left">';
+        html += '<a href="" onClick="javascript:return favoriteClick(\'' + symbol + '\')">' + symbol + '</a>';
+        html += '</td><td class="text-left" id="favorites-name-' + symbol + '">';
+        html += 'loading name...';
+        html += '</td><td class="text-left" id="favorites-price-' + symbol + '">';
+        html += 'loading price...';
+        html += '</td><td class="text-left" id="favorites-change-' + symbol + '">';
+        html += 'loading change...';
+        html += '</td><td class="text-left" id="favorites-cap-' + symbol + '">';
+        html += 'loading cap...';
+        html += '</td><td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite(\'' + symbol + '\')"><span class="glyphicon glyphicon-trash"></span></button></td></tr>';
+        $('#favorite-table tbody:last').append(html);
+        updateFavorite(symbol, true);
+        // Update details section star button
+        $('#favorite-star-icon').removeClass('glyphicon-star-empty');
+        $('#favorite-star-icon').addClass('glyphicon-star');
+        $('#favorite-star-icon').css('color', '#FFFB38');
+      }
+    }
+
+    function toggleFavorite() {
+      if (isFavorite(symbol)) {
+        removeFavorite(symbol);
+      } else {
+        addFavorite(symbol);
+      }
     }
 
     function facebookPost() {
-      //TODO
+      //TODO feed dialog!?
       FB.ui({
         method: 'share',
         href: 'http://dev.markitondemand.com/MODApis/',
@@ -410,33 +532,7 @@
             </div>
             <div class="panel-body">
               <div class="table-responsive">
-                <table class="table table-striped no-bottom">
-                  <tr>
-                    <th>Symbol</th>
-                    <th>Company Name</th>
-                    <th>Stock Price</th>
-                    <th>Change (Percent Change)</th>
-                    <th>Market Cap</th>
-                    <th></th>
-                  </tr>
-                  <!--
-                  <tr>
-                    <td class="text-left">Dummy data</td>
-                    <td class="text-left">Company Name</td>
-                    <td class="text-left">Stock Price</td>
-                    <td class="text-left">Change (Percent Change)</td>
-                    <td class="text-left">Market Cap</td>
-                    <td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite('<first>')"><span class="glyphicon glyphicon-trash"></span></button></td>
-                  </tr>
-                  <tr>
-                    <td class="text-left">Symbol</td>
-                    <td class="text-left">Company Name</td>
-                    <td class="text-left">Stock Price</td>
-                    <td class="text-left">Change (Percent Change)</td>
-                    <td class="text-left">Market Cap</td>
-                    <td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite('<second>')"><span class="glyphicon glyphicon-trash"></span></button></td>
-                  </tr>
-                  -->
+                <table class="table table-striped no-bottom" id='favorite-table'>
                 </table>
               </div>
             </div>
@@ -525,7 +621,7 @@
                 <div class="col-sm-6 align-right">
                   <span>
                     <a href="" onClick="javascript:return facebookPost()"><img src="fb.png"></img></a>
-                    <button type="button" class="btn btn-default" onClick="makeFavorite()"><span class="glyphicon glyphicon-star"></span></button>
+                    <button type="button" class="btn btn-default" onClick="toggleFavorite()"><span id="favorite-star-icon" class="glyphicon glyphicon-star-empty"></span></button>
                   </span>
                   <br>
                   <div id="stock-day-chart"></div>
@@ -551,6 +647,9 @@
     $('#carousel-main').carousel({
       interval: false
     })
+  </script>
+  <script>
+    loadFavorites();
   </script>
 </body>
 </html>
