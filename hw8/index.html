@@ -14,6 +14,9 @@
   <script lang="JavaScript">
     // The current stock to display in the details section
     symbol = "AAPL"; //TODO remove
+    company_name = "Apple Inc";
+    last_price = 103.00;
+    change_str = '-0.32 (-0.61%)';
     favorites_list = [];
     autorefresh = false;
 
@@ -52,11 +55,14 @@
           try {
             var js_data = JSON.parse(data);
             $('#stock-table-name').text(js_data['Name']);
+            company_name = js_data['Name'];
             $('#stock-table-symbol').text(js_data['Symbol']);
             $('#stock-table-last-price').text('$ ' + js_data['LastPrice']);
+            last_price = js_data['LastPrice'];
             var positive = Number(js_data['Change']) > 0;
             var display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['Change'] + ' ( ' + js_data['ChangePercent'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
             $('#stock-table-change-percent').html(display);
+            change_str = last_price + ' (' + js_data['ChangePercent'] + '%)';
             $('#stock-table-timestamp').text(moment(new Date(js_data['Timestamp'])).local().format('DD MMM YYYY, hh:mm:ss a'));
             $('#stock-table-market-cap').text(js_data['MarketCap']);
             $('#stock-table-volume').text(js_data['Volume']);
@@ -393,9 +399,12 @@
     }
 
     function facebookPost() {
-      //TODO feed dialog!?
       FB.ui({
-        method: 'share',
+        method: 'feed',
+        name: 'Current Stock Price of ' + company_name + ' is $' + last_price,
+        caption: 'Stock Information of ' + company_name + ' (' + symbol + ')',
+        description: 'Last Traded Price: $ ' + last_price + ', Change: ' + change_str,
+        picture: "https://chart.yahoo.com/t?s=" + symbol + "&lang=en-US&width=400&height=300",
         href: 'http://dev.markitondemand.com/MODApis/',
       }, function(response){
         if (response) {
@@ -526,7 +535,7 @@
                     <input id="auto-refresh-toggle" type="checkbox" data-toggle="toggle" data-size="normal" onChange="toggleAutoRefresh()">
                   </span>
                   <button type="button" class="btn btn-default" onClick="refreshFavorites()" data-toggle="tooltip" data-placement="top" title="Refresh the prices of your favorite stocks"><span class="glyphicon glyphicon-refresh"></span></button>
-                  <button type="button" class="btn btn-default" id="display-stock-info" href="#carousel-main" data-slide="next" data-toggle="tooltip" data-placement="top" title="View stock information" disabled><span class="glyphicon glyphicon-chevron-right"></span></button>
+                  <button type="button" class="btn btn-default" id="display-stock-info" href="#carousel-main" data-slide="next" data-toggle="tooltip" data-placement="top" title="View stock information" ><span class="glyphicon glyphicon-chevron-right"></span></button>
                 </span>
 
               </span>
@@ -619,11 +628,11 @@
                     </table>
                   </div>
                 </div>
-                <div class="col-sm-6 align-right">
-                  <span>
+                <span class="floating-buttons margin-8">
                     <a href="" onClick="javascript:return facebookPost()"><img src="fb.png"></img></a>
                     <button type="button" class="btn btn-default" onClick="toggleFavorite()"><span id="favorite-star-icon" class="glyphicon glyphicon-star-empty"></span></button>
-                  </span>
+                </span>
+                <div class="col-sm-6 align-right">
                   <br>
                   <div id="stock-day-chart"></div>
                 </div>

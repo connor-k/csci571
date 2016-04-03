@@ -46,6 +46,16 @@ hr {
     margin: 4px 0px 0px;
 }
 
+.floating-buttons {
+    display: block;
+    float: right;
+    position: absolute;
+    right: 145px;
+    top: 150px;
+}
+.fixed-table-container {
+    border:0px;
+}
 .gray-gradient {
     background: #EBEBEB;
     background: linear-gradient(#F6F6F6, #E8E8E8);
