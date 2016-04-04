@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
   <link rel="stylesheet" type="text/css" href="css/style.css">
-  <script src="http://code.jquery.com/jquery.min.js"></script>
-  <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
   <script src="js/bootstrap.min.js"></script>
   <script src="js/moment.js"></script>
   <script lang="JavaScript">
@@ -49,7 +49,7 @@
     function updateAPIData() {
       // Current Stock data
       $.ajax({
-        url: "http://localhost/",
+        url: "https://inspired-photon-127022.appspot.com/stock-api.php",
         data: {symbol: symbol},
         success: function(data) {
           try {
@@ -62,7 +62,7 @@
             var positive = Number(js_data['Change']) > 0;
             var display = '<span class="' + (positive ? 'green' : 'red') + '">' + js_data['Change'] + ' ( ' + js_data['ChangePercent'] + '% ) <img src="' + (positive ? 'up' : 'down') + '.png"></img></span>';
             $('#stock-table-change-percent').html(display);
-            change_str = last_price + ' (' + js_data['ChangePercent'] + '%)';
+            change_str = js_data['Change'] + ' (' + js_data['ChangePercent'] + '%)';
             $('#stock-table-timestamp').text(moment(new Date(js_data['Timestamp'])).local().format('DD MMM YYYY, hh:mm:ss a'));
             $('#stock-table-market-cap').text(js_data['MarketCap']);
             $('#stock-table-volume').text(js_data['Volume']);
@@ -84,7 +84,7 @@
 
       // Chart data
       $.ajax({
-        url: "http://localhost/",
+        url: "https://inspired-photon-127022.appspot.com/stock-api.php",
         data: {chart: symbol},
         success: function(data) {
           try {
@@ -169,7 +169,7 @@
 
       // News data
       $.ajax({
-        url: "http://localhost/",
+        url: "https://inspired-photon-127022.appspot.com/stock-api.php",
         data: {news: symbol},
         success: function(data) {
           var js_data = JSON.parse(data);
@@ -217,7 +217,7 @@
 
       // Check that the input matches a symbol from the lookup response
       symbol = document.getElementById('search_input').value.toUpperCase();
-      if (autocomplete_symbols[symbol]) {
+      if (autocomplete_symbols !== null && autocomplete_symbols[symbol]) {
         // Enable display button
         $('#display-stock-info').prop('disabled', false);
         // Do the search
@@ -292,6 +292,9 @@
     }
 
     function isFavorite(s) {
+      if (favorites_list === null) {
+        return false;
+      }
       return favorites_list.indexOf(s) != -1;
     }
 
@@ -299,7 +302,7 @@
       if (isFavorite(s)) {
         // Get the stock data
         $.ajax({
-          url: "http://localhost/",
+          url: "https://inspired-photon-127022.appspot.com/stock-api.php",
           data: {symbol: s},
           success: function(data) {
             try {
@@ -335,21 +338,26 @@
 
     function loadFavorites() {
       favorites_list = JSON.parse(localStorage.getItem('favorites'));
-      var html = '<tr><th>Symbol</th><th>Company Name</th><th>Stock Price</th><th>Change (Percent Change)</th><th>Market Cap</th><th></th></tr>';
+
       // Generate html
-      for (var i = 0; i < favorites_list.length; i++) {
-        html += '<tr id="favorites-row-' + favorites_list[i] + '"><td class="text-left">';
-        html += '<a href="" onClick="javascript:return favoriteClick(\'' + favorites_list[i] + '\')">' + favorites_list[i] + '</a>';
-        html += '</td><td class="text-left" id="favorites-name-' + favorites_list[i] + '">';
-        html += '</td><td class="text-left" id="favorites-price-' + favorites_list[i] + '">';
-        html += '</td><td class="text-left" id="favorites-change-' + favorites_list[i] + '">';
-        html += '</td><td class="text-left" id="favorites-cap-' + favorites_list[i] + '">';
-        html += '</td><td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite(\'' + favorites_list[i] + '\')"><span class="glyphicon glyphicon-trash"></span></button></td></tr>';
+      var html = '<tr><th>Symbol</th><th>Company Name</th><th>Stock Price</th><th>Change (Percent Change)</th><th>Market Cap</th><th></th></tr>';
+      if (favorites_list !== null) {
+        for (var i = 0; i < favorites_list.length; i++) {
+          html += '<tr id="favorites-row-' + favorites_list[i] + '"><td class="text-left">';
+          html += '<a href="" onClick="javascript:return favoriteClick(\'' + favorites_list[i] + '\')">' + favorites_list[i] + '</a>';
+          html += '</td><td class="text-left" id="favorites-name-' + favorites_list[i] + '">';
+          html += '</td><td class="text-left" id="favorites-price-' + favorites_list[i] + '">';
+          html += '</td><td class="text-left" id="favorites-change-' + favorites_list[i] + '">';
+          html += '</td><td class="text-left" id="favorites-cap-' + favorites_list[i] + '">';
+          html += '</td><td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite(\'' + favorites_list[i] + '\')"><span class="glyphicon glyphicon-trash"></span></button></td></tr>';
+        }
       }
       $('#favorite-table').html(html);
       // Populate
-      for (var i = 0; i < favorites_list.length; i++) {
-        updateFavorite(favorites_list[i], true);
+      if (favorites_list !== null) {
+        for (var i = 0; i < favorites_list.length; i++) {
+          updateFavorite(favorites_list[i], true);
+        }
       }
     }
 
@@ -370,7 +378,11 @@
 
     function addFavorite() {
       if (!isFavorite(symbol)) {
-        favorites_list.push(symbol.toUpperCase());
+        if (favorites_list !== null) {
+          favorites_list.push(symbol.toUpperCase());
+        } else {
+          favorites_list = [symbol.toUpperCase()];
+        }
         localStorage.setItem('favorites', JSON.stringify(favorites_list));
         // Add this one element
         var html = '';
@@ -405,7 +417,8 @@
         caption: 'Stock Information of ' + company_name + ' (' + symbol + ')',
         description: 'Last Traded Price: $ ' + last_price + ', Change: ' + change_str,
         picture: "https://chart.yahoo.com/t?s=" + symbol + "&lang=en-US&width=400&height=300",
-        href: 'http://dev.markitondemand.com/MODApis/',
+        link: 'http://dev.markitondemand.com/MODApis/',
+        redirect_uri: 'https://inspired-photon-127022.appspot.com/'
       }, function(response){
         if (response) {
           alert('Posted Successfully');
@@ -426,7 +439,7 @@
         autocomplete_request.abort();
       }
       autocomplete_request = $.ajax({
-        url: "http://localhost/",
+        url: "https://inspired-photon-127022.appspot.com/stock-api.php",
         data: {input: request.term},
         success: function( data ) {
           autocomplete_symbols = [];
@@ -479,7 +492,7 @@
        var js, fjs = d.getElementsByTagName(s)[0];
        if (d.getElementById(id)) {return;}
        js = d.createElement(s); js.id = id;
-       js.src = "//connect.facebook.net/en_US/sdk.js";
+       js.src = "https://connect.facebook.net/en_US/sdk.js";
        fjs.parentNode.insertBefore(js, fjs);
      }(document, 'script', 'facebook-jssdk'));
   </script>
@@ -535,7 +548,7 @@
                     <input id="auto-refresh-toggle" type="checkbox" data-toggle="toggle" data-size="normal" onChange="toggleAutoRefresh()">
                   </span>
                   <button type="button" class="btn btn-default" onClick="refreshFavorites()" data-toggle="tooltip" data-placement="top" title="Refresh the prices of your favorite stocks"><span class="glyphicon glyphicon-refresh"></span></button>
-                  <button type="button" class="btn btn-default" id="display-stock-info" href="#carousel-main" data-slide="next" data-toggle="tooltip" data-placement="top" title="View stock information" ><span class="glyphicon glyphicon-chevron-right"></span></button>
+                  <button type="button" class="btn btn-default" id="display-stock-info" href="#carousel-main" data-slide="next" data-toggle="tooltip" data-placement="top" title="View stock information" disabled><span class="glyphicon glyphicon-chevron-right"></span></button>
                 </span>
 
               </span>
@@ -628,7 +641,7 @@
                     </table>
                   </div>
                 </div>
-                <span class="floating-buttons margin-8">
+                <span class="align-right">
                     <a href="" onClick="javascript:return facebookPost()"><img src="fb.png"></img></a>
                     <button type="button" class="btn btn-default" onClick="toggleFavorite()"><span id="favorite-star-icon" class="glyphicon glyphicon-star-empty"></span></button>
                 </span>
