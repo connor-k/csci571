@@ -65,10 +65,19 @@
             printf("%s", $response);
         }
     } else if (isset($_GET[ACTION_NEWS])) {
-        $news_baseurl = 'https://ajax.googleapis.com/ajax/services/search/news?v=1.0&q=';
-        $news_endurl = '&userip=104.32.160.3';
+        $key = '9BuSpXwlNTHIMM5KOAo9RyhoJBmV/hFOKwRnHvcRSnU';
+        $news_baseurl = 'https://api.datamarket.azure.com/Bing/Search/v1/News?Query=%27';
+        $news_endurl = '%27&$format=json';
         $input = urlencode(htmlspecialchars(trim($_GET[ACTION_NEWS])));
-        $response = @file_get_contents($news_baseurl.$input.$news_endurl);
+        $cred = sprintf('Authorization: Basic %s', base64_encode($key.":".$key));
+        $context = stream_context_create(array(
+            'http' => array(
+                'header'  => $cred
+            )
+        ));
+        $response = @file_get_contents($news_baseurl.$input.$news_endurl, 0, $context);
+        //$response = str_replace("\"", "\\\"", $response);
+        $response = str_replace("â€™", "\\'", $response);
         printf("%s", $response);
     } else if (isset($_GET[ACTION_CHART])) {
         $chart_baseurl = 'http://dev.markitondemand.com/MODApis/Api/v2/InteractiveChart/json?parameters=%7b%22Normalized%22:false,%22NumberOfDays%22:1095,%22DataPeriod%22:%22Day%22,%22Elements%22:%5b%7b%22Symbol%22:%22';

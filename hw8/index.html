@@ -170,12 +170,11 @@
       });
 
       // News data
-      //TODO uncomment for submission (qps)
-      /*
       $.ajax({
         url: "https://inspired-photon-127022.appspot.com/stock-api.php",
         data: {news: symbol},
         success: function(data) {
+          d = data;
           var js_data = JSON.parse(data);
           var block1 = '<div class="well text-left margin-16"><p><a href="';
           var block2 = '#">';
@@ -185,19 +184,19 @@
           var block6 = '</b></p></div>';
           var feed = "";
           try {
-            for (var i = 0; i < js_data['responseData']['results'].length; i++) {
-              feed += block1 + js_data['responseData']['results'][i]['unescapedUrl'];
-              feed += block2 + js_data['responseData']['results'][i]['titleNoFormatting'];
-              feed += block3 + js_data['responseData']['results'][i]['content'];
-              feed += block4 + js_data['responseData']['results'][i]['publisher'];
-              feed += block5 + js_data['responseData']['results'][i]['publishedDate'] + block6;
+            for (var i = 0; i < js_data['d']['results'].length; i++) {
+              feed += block1 + js_data['d']['results'][i]['Url'];
+              feed += block2 + js_data['d']['results'][i]['Title'];
+              feed += block3 + js_data['d']['results'][i]['Description'];
+              feed += block4 + js_data['d']['results'][i]['Source'];
+              feed += block5 + moment(new Date(js_data['d']['results'][i]['Date'])).local().format('DD MMM YYYY hh:mm:ss') + block6;
             }
             $('#news-feed-div').html(feed);
           } catch (e) {
             $('#news-feed-div').html('<p>Note: Google News Feed QPS Exceeded</p>');
           }
         }
-      }); */
+      });
 
       // Update favorite button with the proper style
       if (isFavorite(symbol)) {
