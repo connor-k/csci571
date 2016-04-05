@@ -66,7 +66,7 @@
         }
     } else if (isset($_GET[ACTION_NEWS])) {
         $news_baseurl = 'https://ajax.googleapis.com/ajax/services/search/news?v=1.0&q=';
-        $news_endurl = '&userip=128.9.112.1'; //TODO change ip?
+        $news_endurl = '&userip=104.32.160.3';
         $input = urlencode(htmlspecialchars(trim($_GET[ACTION_NEWS])));
         $response = @file_get_contents($news_baseurl.$input.$news_endurl);
         printf("%s", $response);

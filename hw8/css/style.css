@@ -1,6 +1,6 @@
 body {
     background-image: url('/background.jpg');
-    background-size: 100%;
+    background-size: 100% auto;
     padding: 8px;
 }
 
@@ -104,7 +104,7 @@ hr {
 }
 
 .partial-width {
-    width: 76%;
+    width: 82%;
 }
 
 .red {

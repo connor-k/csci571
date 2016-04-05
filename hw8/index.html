@@ -57,6 +57,8 @@
             $('#stock-table-name').text(js_data['Name']);
             company_name = js_data['Name'];
             $('#stock-table-symbol').text(js_data['Symbol']);
+            // Set the symbol for some edge cases like MOD returns GOOGL for GOOG query
+            symbol = js_data['Symbol'];
             $('#stock-table-last-price').text('$ ' + js_data['LastPrice']);
             last_price = js_data['LastPrice'];
             var positive = Number(js_data['Change']) > 0;
@@ -80,7 +82,7 @@
       });
 
       // Yahoo daily stock chart API call
-      $('#stock-day-chart').html("<img src=https://chart.yahoo.com/t?s=" + symbol + "&lang=en-US&width=400&height=300></img>");
+      $('#stock-day-chart').html("<img src='https://chart.yahoo.com/t?s=" + symbol + "&lang=en-US&width=400&height=300' style='max-width: 100%; height: auto;'></img>");
 
       // Chart data
       $.ajax({
@@ -168,6 +170,8 @@
       });
 
       // News data
+      //TODO uncomment for submission (qps)
+      /*
       $.ajax({
         url: "https://inspired-photon-127022.appspot.com/stock-api.php",
         data: {news: symbol},
@@ -193,13 +197,13 @@
             $('#news-feed-div').html('<p>Note: Google News Feed QPS Exceeded</p>');
           }
         }
-      });
+      }); */
 
       // Update favorite button with the proper style
       if (isFavorite(symbol)) {
         $('#favorite-star-icon').removeClass('glyphicon-star-empty');
         $('#favorite-star-icon').addClass('glyphicon-star');
-        $('#favorite-star-icon').css('color', '#FFFB38');
+        $('#favorite-star-icon').css('color', '#FFFD38');
       } else {
         $('#favorite-star-icon').removeClass('glyphicon-star');
         $('#favorite-star-icon').addClass('glyphicon-star-empty');
@@ -217,7 +221,7 @@
 
       // Check that the input matches a symbol from the lookup response
       symbol = document.getElementById('search_input').value.toUpperCase();
-      if (autocomplete_symbols !== null && autocomplete_symbols[symbol]) {
+      if (typeof autocomplete_symbols !== 'undefined' && autocomplete_symbols !== null && autocomplete_symbols[symbol]) {
         // Enable display button
         $('#display-stock-info').prop('disabled', false);
         // Do the search
@@ -349,7 +353,7 @@
           html += '</td><td class="text-left" id="favorites-price-' + favorites_list[i] + '">';
           html += '</td><td class="text-left" id="favorites-change-' + favorites_list[i] + '">';
           html += '</td><td class="text-left" id="favorites-cap-' + favorites_list[i] + '">';
-          html += '</td><td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite(\'' + favorites_list[i] + '\')"><span class="glyphicon glyphicon-trash"></span></button></td></tr>';
+          html += '</td><td class="text-left"><button type="button" class="btn btn-default gray-gradient" onClick="removeFavorite(\'' + favorites_list[i] + '\')"><span class="glyphicon glyphicon-trash"></span></button></td></tr>';
         }
       }
       $('#favorite-table').html(html);
@@ -392,13 +396,13 @@
         html += '</td><td class="text-left" id="favorites-price-' + symbol + '">';
         html += '</td><td class="text-left" id="favorites-change-' + symbol + '">';
         html += '</td><td class="text-left" id="favorites-cap-' + symbol + '">';
-        html += '</td><td class="text-left"><button type="button" class="btn btn-default" onClick="removeFavorite(\'' + symbol + '\')"><span class="glyphicon glyphicon-trash"></span></button></td></tr>';
+        html += '</td><td class="text-left"><button type="button" class="btn btn-default gray-gradient" onClick="removeFavorite(\'' + symbol + '\')"><span class="glyphicon glyphicon-trash"></span></button></td></tr>';
         $('#favorite-table tbody:last').append(html);
         updateFavorite(symbol, true);
         // Update details section star button
         $('#favorite-star-icon').removeClass('glyphicon-star-empty');
         $('#favorite-star-icon').addClass('glyphicon-star');
-        $('#favorite-star-icon').css('color', '#FFFB38');
+        $('#favorite-star-icon').css('color', '#FFFD38');
       }
     }
 
@@ -513,7 +517,7 @@
         </div>
         <div class="col-sm-3 mobile-align-left">
           <button type="button" class="btn btn-primary" onClick="submitSearch()"><span class="glyphicon glyphicon-search"></span> Get Quote</button>
-          <button type="button" class="btn btn-default" onClick="clearForm()"><span class="glyphicon glyphicon-refresh"></span> Clear</button>
+          <button type="button" class="btn btn-default gray-gradient" onClick="clearForm()"><span class="glyphicon glyphicon-refresh"></span> Clear</button>
         </div>
       </div>
       <div class="row padding-t-16">
@@ -522,7 +526,7 @@
           <span class="red align-left" id="select-valid-error" hidden><small>Select a valid entry</small></span>
         </div>
         <div class="col-sm-3 mobile-align-left">
-          <span>Powered By:</span><a href="http://dev.markitondemand.com/MODApis/" target="_blank"><img src="mod-logo.png" width="120" height="24"></img></a>
+          <span>Powered By:</span><a href="http://dev.markitondemand.com/MODApis/" target="_blank"><img src="mod-logo.png" width="120" height="24"></a>
         </div>
       </div>
     </div>
@@ -530,11 +534,11 @@
 
   <hr class="align-center partial-width margin-tb-16">
 
-  <div id="carousel-main" class="carousel slide">
+  <div id="carousel-main" class="carousel slide partial-width" style="left: 9%;">
     <div class="carousel-inner">
 
       <div class="item active">
-        <div class="container_panel panel panel-default partial-width align-center padding-16">
+        <div class="container_panel panel panel-default align-center padding-16">
           <div class="panel panel-default">
             <div class="panel-heading gray-gradient no-bottom">
               <span class="row favorite-list-header">
@@ -547,8 +551,8 @@
                   <span data-toggle="tooltip" data-placement="top" title="Refresh favorites every 5 seconds">
                     <input id="auto-refresh-toggle" type="checkbox" data-toggle="toggle" data-size="normal" onChange="toggleAutoRefresh()">
                   </span>
-                  <button type="button" class="btn btn-default" onClick="refreshFavorites()" data-toggle="tooltip" data-placement="top" title="Refresh the prices of your favorite stocks"><span class="glyphicon glyphicon-refresh"></span></button>
-                  <button type="button" class="btn btn-default" id="display-stock-info" href="#carousel-main" data-slide="next" data-toggle="tooltip" data-placement="top" title="View stock information" disabled><span class="glyphicon glyphicon-chevron-right"></span></button>
+                  <button type="button" class="btn btn-default gray-gradient" onClick="refreshFavorites()" data-toggle="tooltip" data-placement="top" title="Refresh the prices of your favorite stocks"><span class="glyphicon glyphicon-refresh"></span></button>
+                  <button type="button" class="btn btn-default gray-gradient" id="display-stock-info" href="#carousel-main" data-slide="next" data-toggle="tooltip" data-placement="top" title="View stock information" disabled><span class="glyphicon glyphicon-chevron-right"></span></button>
                 </span>
 
               </span>
@@ -564,12 +568,12 @@
       </div>
 
       <div class="item">
-        <div class="container_panel panel panel-default partial-width align-center padding-16">
+        <div class="container_panel panel panel-default align-center padding-16">
           <div class="panel panel-default">
             <div class="panel-heading gray-gradient no-bottom">
               <span class="row favorite-list-header">
                 <span class="col-sm-1 align-left">
-                  <button type="button" class="btn btn-default" href="#carousel-main" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></button>
+                  <button type="button" class="btn btn-default gray-gradient" href="#carousel-main" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></button>
                 </span>
                 <span class="col-sm-11">
                   <label class="control-label align-center">Stock Details</label>
@@ -584,14 +588,20 @@
               </ul>
               <hr>
               <div class="row" id="current-stock-div">
-                <div class="col-sm-6 ">
+                <div class="col-sm-12">
+                  <table class="align-left" style="margin-left: 32px;">
+                    <tr>
+                      <th colspan="2">Stock Details</th>
+                    </tr>
+                  </table>
+                  <span class="align-right" style="margin-right: 32px;">
+                    <a href="" onClick="javascript:return facebookPost()"><img src="fb.png"></a>
+                    <button type="button" class="btn btn-default gray-gradient" onClick="toggleFavorite()"><span id="favorite-star-icon" class="glyphicon glyphicon-star-empty"></span></button>
+                  </span>
+                </div>
+                <div class="col-sm-6">
                   <div class="table-responsive">
                     <table class="table table-striped no-bottom">
-                      <thead>
-                        <tr>
-                          <th colspan="2">Stock Details</th>
-                        </tr>
-                      </thead>
                       <tbody>
                         <tr>
                           <th class="text-left">Name</th>
@@ -641,10 +651,6 @@
                     </table>
                   </div>
                 </div>
-                <span class="align-right">
-                    <a href="" onClick="javascript:return facebookPost()"><img src="fb.png"></img></a>
-                    <button type="button" class="btn btn-default" onClick="toggleFavorite()"><span id="favorite-star-icon" class="glyphicon glyphicon-star-empty"></span></button>
-                </span>
                 <div class="col-sm-6 align-right">
                   <br>
                   <div id="stock-day-chart"></div>
