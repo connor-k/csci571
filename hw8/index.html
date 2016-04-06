@@ -13,7 +13,7 @@
   <script src="js/moment.js"></script>
   <script lang="JavaScript">
     // The current stock to display in the details section
-    symbol = "AAPL"; //TODO remove
+    symbol = "AAPL";
     company_name = "Apple Inc";
     last_price = 103.00;
     change_str = '-0.32 (-0.61%)';
@@ -76,7 +76,22 @@
             $('#stock-table-opening-price').text('$ ' + js_data['Open']);
           } catch (e) {
             // Alert the API call was bad
-            alert('Note: Markit on Demand queries exceeded, please wait and try again.');
+            console.log('Note: No data available, or Markit on Demand queries exceeded. Please wait and try again.');
+            company_name = "";
+            last_price = 0.0;
+            change_str = 'N/A';
+            $('#stock-table-name').text('<QPS exceeded or not in MOD database>');
+            $('#stock-table-symbol').text(symbol);
+            $('#stock-table-last-price').text('N/A');
+            $('#stock-table-change-percent').html('N/A');
+            $('#stock-table-timestamp').text('N/A');
+            $('#stock-table-market-cap').text('N/A');
+            $('#stock-table-volume').text('N/A');
+            $('#stock-table-change-ytd').html('N/A');
+            $('#stock-table-high-price').text('N/A');
+            $('#stock-table-low-price').text('N/A');
+            $('#stock-table-opening-price').text('N/A');
+            return false;
           }
         }
       });
@@ -164,7 +179,8 @@
               }]
             });
           } catch (e) {
-            alert('Note: Markit on Demand queries exceeded, please wait and try again.');
+            console.log('Note: Markit on Demand queries exceeded, please wait and try again.');
+            return false;
           }
         },
       });
@@ -193,22 +209,18 @@
             }
             $('#news-feed-div').html(feed);
           } catch (e) {
-            $('#news-feed-div').html('<p>Note: Google News Feed QPS Exceeded</p>');
+            $('#news-feed-div').html('<p>Note: Bing News Feed Queries Exceeded</p>');
           }
         }
       });
 
       // Update favorite button with the proper style
       if (isFavorite(symbol)) {
-        $('#favorite-star-icon').removeClass('glyphicon-star-empty');
-        $('#favorite-star-icon').addClass('glyphicon-star');
         $('#favorite-star-icon').css('color', '#FFFD38');
       } else {
-        $('#favorite-star-icon').removeClass('glyphicon-star');
-        $('#favorite-star-icon').addClass('glyphicon-star-empty');
-        $('#favorite-star-icon').css('color', '#000000');
+        $('#favorite-star-icon').css('color', '#FFFFFF');
       }
-
+      return true;
     }
 
     function submitSearch() {
@@ -221,12 +233,13 @@
       // Check that the input matches a symbol from the lookup response
       symbol = document.getElementById('search_input').value.toUpperCase();
       if (typeof autocomplete_symbols !== 'undefined' && autocomplete_symbols !== null && autocomplete_symbols[symbol]) {
-        // Enable display button
-        $('#display-stock-info').prop('disabled', false);
-        // Do the search
-        $('#carousel-main').carousel(1);
         // Update data and show the current stock info page
-        updateAPIData();
+        if (updateAPIData()) {
+          // Enable display button
+          $('#display-stock-info').prop('disabled', false);
+          // Do the search
+          $('#carousel-main').carousel(1);
+        }
       } else {
         // Display error message
         $('#select-valid-error').show();
@@ -321,7 +334,7 @@
               $('#favorites-change-' + s).html(display);
             } catch (e) {
               // Alert the API call was bad
-              alert('Note: Markit on Demand queries exceeded, please wait and try again.');
+              console.log('Note: Markit on Demand queries exceeded, please wait and try again.');
             }
           }
         });
@@ -372,9 +385,7 @@
         $('#favorites-row-' + s).remove();
         // Update details section star button if this was the selected stock
         if (symbol == s) {
-          $('#favorite-star-icon').removeClass('glyphicon-star');
-          $('#favorite-star-icon').addClass('glyphicon-star-empty');
-          $('#favorite-star-icon').css('color', '#000000');
+          $('#favorite-star-icon').css('color', '#FFFFFF');
         }
       }
     }
@@ -399,8 +410,6 @@
         $('#favorite-table tbody:last').append(html);
         updateFavorite(symbol, true);
         // Update details section star button
-        $('#favorite-star-icon').removeClass('glyphicon-star-empty');
-        $('#favorite-star-icon').addClass('glyphicon-star');
         $('#favorite-star-icon').css('color', '#FFFD38');
       }
     }
@@ -541,11 +550,11 @@
           <div class="panel panel-default">
             <div class="panel-heading gray-gradient no-bottom">
               <span class="row favorite-list-header">
-                <span class="col-sm-2">
+                <span class="col-lg-2">
                   <label class="control-label align-left">Favorite List</label>
                 </span>
-                <span class="col-sm-5"></span>
-                <span class="col-sm-5 align-right">
+                <span class="col-lg-5"></span>
+                <span class="col-lg-5 align-right">
                   <span class="hide-mobile">Automatic Refresh:</span>
                   <span data-toggle="tooltip" data-placement="top" title="Refresh favorites every 5 seconds">
                     <input id="auto-refresh-toggle" type="checkbox" data-toggle="toggle" data-size="normal" onChange="toggleAutoRefresh()">
@@ -556,8 +565,8 @@
 
               </span>
             </div>
-            <div class="panel-body">
-              <div class="table-responsive">
+            <div class="panel-body" style="overflow: scroll;">
+              <div>
                 <table class="table table-striped no-bottom" id='favorite-table'>
                 </table>
               </div>
@@ -586,20 +595,20 @@
                 <li id="news-feed-nav"><a onClick="doNewsFeed()"><span class="glyphicon glyphicon-link"></span> News<span class="hide-mobile"> Feeds</span></a></li>
               </ul>
               <hr>
-              <div class="row" id="current-stock-div">
-                <div class="col-sm-12">
-                  <table class="align-left" style="margin-left: 32px;">
-                    <tr>
-                      <th colspan="2">Stock Details</th>
-                    </tr>
-                  </table>
-                  <span class="align-right" style="margin-right: 32px;">
+              <div id="current-stock-div">
+                <div>
+                  <span class="align-left" style="margin-left: 24px">
+                      <span style="font-weight: bold;">Stock Details</span>
+                  </span>
+                  <span class="align-right" style="margin-right: 24px">
                     <a href="" onClick="javascript:return facebookPost()"><img src="fb.png"></a>
-                    <button type="button" class="btn btn-default gray-gradient" onClick="toggleFavorite()"><span id="favorite-star-icon" class="glyphicon glyphicon-star-empty"></span></button>
+                    <button type="button" class="btn btn-default gray-gradient" onClick="toggleFavorite()"><span id="favorite-star-icon" class="glyphicon glyphicon-star" style="color: #FFFFFF;"></span></button>
                   </span>
                 </div>
+              <br style="clear: both;"/>
+              <div class="row">
                 <div class="col-sm-6">
-                  <div class="table-responsive">
+                  <div>
                     <table class="table table-striped no-bottom">
                       <tbody>
                         <tr>
@@ -654,8 +663,8 @@
                   <br>
                   <div id="stock-day-chart"></div>
                 </div>
-
               </div>
+            </div>
               <div class="row" id="historical-charts-div" hidden>
                 <div id="chart-container" class="align-center margin-16"></div>
               </div>

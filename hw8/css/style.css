@@ -47,6 +47,10 @@ hr {
     margin: 4px 0px 0px;
 }
 
+#favorite-table th {
+    white-space: nowrap;
+}
+
 .floating-buttons {
     display: block;
     float: right;
@@ -54,6 +58,7 @@ hr {
     right: 16%;
     top: 150px;
 }
+
 .fixed-table-container {
     border:0px;
 }
