@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">CSCI571-Stocks</string>
+    <string name="label_stock_symbol">Stock Name/Symbol</string>
+    <string name="label_clear">Clear</string>
+    <string name="label_get_quote">Get Quote</string>
+    <string name="label_favorites">Favorites</string>
+    <string name="label_auto_refresh">Auto Refresh</string>
+    <string name="label_refresh">Refresh</string>
+    <string name="label_current">CURRENT</string>
+    <string name="label_historical">HISTORICAL</string>
+    <string name="label_news">NEWS</string>
+    <string name="label_stock_details">Stock Details</string>
+    <string name="label_news_feed">News Feed</string>
+</resources>

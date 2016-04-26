@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.connorkerns.csci571_stocks.MainActivity">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/label_stock_symbol"
+                android:id="@+id/textView"
+                android:textColor="#000000"
+                android:textStyle="bold" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp">
+            <AutoCompleteTextView
+                android:id="@+id/autoCompleteTextView1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="18" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp">
+
+            <Button
+                android:layout_weight="1"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:text="@string/label_clear"
+                android:id="@+id/button_clear" />
+            <Button
+                android:layout_weight="1"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:text="@string/label_get_quote"
+                android:id="@+id/button_get_quote" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="12dp">
+
+            <TextView
+                android:layout_weight="0.5"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/label_favorites"
+                android:id="@+id/textView2"
+                android:textStyle="bold"
+                android:textColor="#000000" />
+
+            <Switch
+                android:layout_weight="0.3"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:text="@string/label_auto_refresh"
+                android:id="@+id/switch1"
+                android:textAlignment="center" />
+
+            <ImageView
+                android:layout_weight="0.1"
+                android:layout_width="0dip"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_refresh_black"
+                android:id="@+id/button_refresh"
+                android:contentDescription="@string/label_refresh" />
+        </TableRow>
+</TableLayout>
