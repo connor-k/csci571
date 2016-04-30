@@ -9,9 +9,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.Selection;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
@@ -64,8 +66,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textView.addTextChangedListener(autocompleteWatcher);
         // From @612, we can just display it on one line
         autocompleteResults = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line);
-        //TODO remove sample adds later
         textView.setAdapter(autocompleteResults);
+        // Only take ticker from front of suggestion on click
+        textView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> p, View v, int pos, long id) {
+                //TODO this is a little sketch
+                String item = p.getItemAtPosition(pos).toString();
+                String ticker = item.substring(0, item.indexOf(' '));
+                Log.d(DEBUG_TAG, "Clicked on list item=" + ticker);
+                textView.setText(ticker);
+                // Move cursor to end
+                int position = ticker.length();
+                Editable etext = textView.getEditableText();
+                Selection.setSelection(etext, position);
+            }
+        });
 
         refreshFavorites();
         doGetRequest("https://inspired-photon-127022.appspot.com/stock-api.php?input=AAPL");
