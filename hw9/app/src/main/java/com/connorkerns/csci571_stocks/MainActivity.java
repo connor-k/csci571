@@ -9,9 +9,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.Html;
 import android.text.Selection;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,6 +21,7 @@ import android.widget.AutoCompleteTextView;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 import java.io.IOException;
@@ -32,7 +35,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private View quoteButton;
     private View refreshButton;
     private AutoCompleteTextView textView;
-    private ArrayAdapter<String> autocompleteResults;
+    private Boolean ignoreAutoComplete = false;
+    private AsyncTask autoCompleteTask = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +58,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         TextWatcher autocompleteWatcher = new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-                doAutoCompleteLookup();
+                // If they clicked on an item and I changed the text, don't show the popup
+                if (ignoreAutoComplete) {
+                    ignoreAutoComplete = false;
+                    textView.dismissDropDown();
+                } else {
+                    doAutoCompleteLookup();
+                }
             }
 
             @Override
@@ -64,9 +74,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
         };
         textView.addTextChangedListener(autocompleteWatcher);
-        // From @612, we can just display it on one line
-        autocompleteResults = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line);
-        textView.setAdapter(autocompleteResults);
         // Only take ticker from front of suggestion on click
         textView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -75,6 +82,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 String item = p.getItemAtPosition(pos).toString();
                 String ticker = item.substring(0, item.indexOf(' '));
                 Log.d(DEBUG_TAG, "Clicked on list item=" + ticker);
+                // Disable adapter temporarily to avoid popup
+                ignoreAutoComplete = true;
                 textView.setText(ticker);
                 // Move cursor to end
                 int position = ticker.length();
@@ -82,9 +91,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Selection.setSelection(etext, position);
             }
         });
+        textView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                textView.showDropDown();
+                return false;
+            }
+        });
 
         refreshFavorites();
-        doGetRequest("https://inspired-photon-127022.appspot.com/stock-api.php?input=AAPL");
     }
 
     @Override
@@ -111,17 +126,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textView.setText("");
     }
 
-    private void doGetRequest(String url) {
-        ConnectivityManager connMgr = (ConnectivityManager)
-                getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            new AutoCompleteRequestTask().execute(url);
-        } else {
-            Log.d(DEBUG_TAG, "Can't do request, no internet connection.");
-        }
-    }
-
     /**
      * AsyncTask to do a get request. The code is adapted from
      * http://developer.android.com/training/basics/network-ops/connecting.html
@@ -138,16 +142,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         protected void onPostExecute(String result) {
+            if (textView.getText().toString().isEmpty()) {
+                Log.d(DEBUG_TAG, "text now empty, clearing adapter...");
+                textView.setAdapter(null);
+                return;
+            }
+            if (isCancelled()) {
+                Log.d(DEBUG_TAG, "cancelling request...");
+                return;
+            }
+
             Log.d(DEBUG_TAG, "Got autocomplete json=" + result);
-            Gson gson = new Gson();
-            JsonParser parser = new JsonParser();
-            JsonArray array = parser.parse(result).getAsJsonArray();
-            autocompleteResults.clear();
-            for (int i = 0; i < array.size(); ++i) {
-                String item = gson.fromJson(array.get(i).getAsJsonObject().get("Display"),
-                        String.class);
-                Log.d(DEBUG_TAG, "autocomplete result: " + item);
-                autocompleteResults.add(item);
+            // From @612, we can just display all info on one line
+            try {
+                ArrayAdapter<String> autocompleteResults = new ArrayAdapter<String>(
+                        MainActivity.this, android.R.layout.simple_dropdown_item_1line);
+                Gson gson = new Gson();
+                JsonParser parser = new JsonParser();
+                JsonArray array = parser.parse(result).getAsJsonArray();
+                for (int i = 0; i < array.size(); ++i) {
+                    String item = gson.fromJson(array.get(i).getAsJsonObject().get("Display"),
+                            String.class);
+                    Log.d(DEBUG_TAG, "autocomplete result: " + item);
+                    autocompleteResults.add(item);
+                }
+                textView.setAdapter(autocompleteResults);
+                textView.showDropDown();
+                Log.d(DEBUG_TAG, "popup showing? " + textView.isPopupShowing());
+            } catch (JsonParseException e) {
+                Log.d(DEBUG_TAG, "autocomplete request had no results or request was cancelled");
+            } catch (IllegalStateException e) {
+                Log.d(DEBUG_TAG, "autocomplete request had no results or request was cancelled");
             }
         }
     }
@@ -188,7 +213,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void doAutoCompleteLookup() {
         Log.d(DEBUG_TAG, "Making lookup request for autocomplete...");
-
+        ConnectivityManager connMgr = (ConnectivityManager)
+                getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        String input = textView.getText().toString().trim();
+        if (!input.isEmpty() && networkInfo != null && networkInfo.isConnected()) {
+            if (autoCompleteTask != null) {
+                autoCompleteTask.cancel(true);
+            }
+            String url = "https://inspired-photon-127022.appspot.com/stock-api.php?input=" +
+                    Html.escapeHtml(input);
+            autoCompleteTask = new AutoCompleteRequestTask().execute(url);
+        } else {
+            Log.d(DEBUG_TAG, "Can't do request, empty or no internet connection.");
+            textView.setAdapter(null);
+        }
     }
 
     /**
