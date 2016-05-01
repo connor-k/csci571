@@ -1,5 +1,8 @@
 package com.connorkerns.csci571_stocks;
 
+import android.app.Dialog;
+import android.content.DialogInterface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -13,12 +16,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.squareup.picasso.Picasso;
+
+import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class ResultActivity extends AppCompatActivity {
     private String symbol;
@@ -140,7 +149,8 @@ public class ResultActivity extends AppCompatActivity {
             addDetailItem(details, "NAME", gson.fromJson(quote.get("Name"), String.class), inflater, container);
             addDivider(details, inflater, container);
 
-            addDetailItem(details, "SYMBOL", gson.fromJson(quote.get("Symbol"), String.class), inflater, container);
+            String symbol = gson.fromJson(quote.get("Symbol"), String.class);
+            addDetailItem(details, "SYMBOL", symbol, inflater, container);
             addDivider(details, inflater, container);
 
             addDetailItem(details, "LASTPRICE", gson.fromJson(quote.get("LastPrice"), String.class), inflater, container);
@@ -181,6 +191,46 @@ public class ResultActivity extends AppCompatActivity {
             addDivider(details, inflater, container);
 
             addDetailItem(details, "OPEN", gson.fromJson(quote.get("Open"), String.class), inflater, container);
+
+            // Load up the stock image
+            final String url = "https://chart.yahoo.com/t?s=" + symbol + "&lang=en-US&width=400&height=300";
+            ImageView imageView = (ImageView)rootView.findViewById(R.id.current_stock_image);
+            Picasso.with(getActivity()).load(url).resize(1200, 900).centerInside().into(imageView);
+            // Open dialog with zoomable image on click
+            imageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Dialog builder = new Dialog(getContext());
+                    builder.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    builder.getWindow().setBackgroundDrawable(
+                            new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                        @Override
+                        public void onDismiss(DialogInterface dialogInterface) {
+                            // Do nothing
+                        }
+                    });
+
+                    ImageView imageView = new ImageView(getActivity());
+                    imageView.setPadding(48, 0, 48, 0);
+                    Picasso.with(getActivity()).load(url).resize(1200, 900).centerInside().into(imageView);
+                    new PhotoViewAttacher(imageView);
+                    builder.addContentView(imageView, new RelativeLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.MATCH_PARENT));
+                    builder.show();
+
+                    /*
+                    Dialog.Builder builder = new Dialog.Builder(getActivity());
+                    final AlertDialog dialog = builder.create();
+                    LinearLayout parent = new LinearLayout(getContext());
+                    ImageView other = imageView;
+                    parent.addView(other);
+                    dialog.setView(parent);
+                    dialog.show();
+                    */
+                }
+            });
 
             return rootView;
         }
