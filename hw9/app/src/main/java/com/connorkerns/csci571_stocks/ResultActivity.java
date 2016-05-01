@@ -13,11 +13,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class ResultActivity extends AppCompatActivity {
     private String symbol;
     private String name;
+    private static String quoteJson;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -53,7 +59,12 @@ public class ResultActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        name = getIntent().getStringExtra(MainActivity.NAME);
+        quoteJson = getIntent().getStringExtra(MainActivity.QUOTE_JSON);
+        Gson gson = new Gson();
+        JsonParser parser = new JsonParser();
+        JsonObject quote = parser.parse(quoteJson).getAsJsonObject();
+
+        name = gson.fromJson(quote.get("Name"), String.class);
         setTitle(name);
     }
 
@@ -80,25 +91,117 @@ public class ResultActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
+    public static class CurrentFragment extends Fragment {
         /**
          * The fragment argument representing the section number for this
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
 
-        public PlaceholderFragment() {
+        public CurrentFragment() {
         }
 
         /**
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
+        public static CurrentFragment newInstance(int sectionNumber) {
+            CurrentFragment fragment = new CurrentFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        private void addDetailItem(LinearLayout parent, String label, String value,
+                                   LayoutInflater inflater, ViewGroup container) {
+            View child = inflater.inflate(R.layout.list_item_details, container, false);
+            ((TextView)child.findViewById(R.id.detailsItemLabel)).setText(label);
+            ((TextView)child.findViewById(R.id.detailsItemValue)).setText(value);
+            parent.addView(child);
+        }
+
+        private void addDivider(LinearLayout parent, LayoutInflater inflater, ViewGroup container) {
+            View child = inflater.inflate(R.layout.divider, container, false);
+            parent.addView(child);
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_current, container, false);
+            LinearLayout details = (LinearLayout) rootView.findViewById(R.id.stock_details_list);
+            View child = inflater.inflate(R.layout.list_item_details, container, false);
+
+            // Parse the JSON and add all the list items
+            Gson gson = new Gson();
+            JsonParser parser = new JsonParser();
+            JsonObject quote = parser.parse(ResultActivity.quoteJson).getAsJsonObject();
+            addDetailItem(details, "NAME", gson.fromJson(quote.get("Name"), String.class), inflater, container);
+            addDivider(details, inflater, container);
+
+            addDetailItem(details, "SYMBOL", gson.fromJson(quote.get("Symbol"), String.class), inflater, container);
+            addDivider(details, inflater, container);
+
+            addDetailItem(details, "LASTPRICE", gson.fromJson(quote.get("LastPrice"), String.class), inflater, container);
+            addDivider(details, inflater, container);
+
+            Double value = gson.fromJson(quote.get("Change"), Double.class);
+            boolean positive = value > 0.0;
+            String display = String.format("%.2f", value);
+            value = gson.fromJson(quote.get("ChangePercent"), Double.class);
+            //TODO check +
+            display += "(" + String.format("%.2f", value) + "%)";
+            //TODO use positive for the arrow image
+            addDetailItem(details, "Change", display, inflater, container);
+            addDivider(details, inflater, container);
+
+            addDetailItem(details, "TIMESTAMP", gson.fromJson(quote.get("Timestamp"), String.class), inflater, container);
+            addDivider(details, inflater, container);
+
+            addDetailItem(details, "MARKETCAP", gson.fromJson(quote.get("MarketCap"), String.class), inflater, container);
+            addDivider(details, inflater, container);
+
+            addDetailItem(details, "VOLUME", gson.fromJson(quote.get("Volume"), String.class), inflater, container);
+            addDivider(details, inflater, container);
+
+            value = gson.fromJson(quote.get("ChangeYTD"), Double.class);
+            positive = value > 0.0;
+            display = String.format("%.2f", value);
+            value = gson.fromJson(quote.get("ChangePercentYTD"), Double.class);
+            display += "(" + String.format("%.2f", value) + "%)";
+            //TODO use positive for the arrow image
+            addDetailItem(details, "CHANGEYTD", display, inflater, container);
+            addDivider(details, inflater, container);
+
+            addDetailItem(details, "HIGH", gson.fromJson(quote.get("High"), String.class), inflater, container);
+            addDivider(details, inflater, container);
+
+            addDetailItem(details, "LOW", gson.fromJson(quote.get("Low"), String.class), inflater, container);
+            addDivider(details, inflater, container);
+
+            addDetailItem(details, "OPEN", gson.fromJson(quote.get("Open"), String.class), inflater, container);
+
+            return rootView;
+        }
+    }
+
+    public static class HistoricalFragment extends Fragment {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private static final String ARG_SECTION_NUMBER = "section_number";
+
+        public HistoricalFragment() {
+        }
+
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        public static HistoricalFragment newInstance(int sectionNumber) {
+            HistoricalFragment fragment = new HistoricalFragment();
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
@@ -111,6 +214,40 @@ public class ResultActivity extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.fragment_result, container, false);
             TextView textView = (TextView) rootView.findViewById(R.id.section_label);
             textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+
+            return rootView;
+        }
+    }
+
+    public static class NewsFragment extends Fragment {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private static final String ARG_SECTION_NUMBER = "section_number";
+
+        public NewsFragment() {
+        }
+
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        public static NewsFragment newInstance(int sectionNumber) {
+            NewsFragment fragment = new NewsFragment();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_result, container, false);
+            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
+            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+
             return rootView;
         }
     }
@@ -129,7 +266,14 @@ public class ResultActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            switch (position) {
+                default:
+                    return CurrentFragment.newInstance(position + 1);
+                case 1:
+                    return HistoricalFragment.newInstance(position + 1);
+                case 2:
+                    return NewsFragment.newInstance(position + 1);
+            }
         }
 
         @Override

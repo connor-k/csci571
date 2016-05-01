@@ -22,6 +22,7 @@ import android.widget.AutoCompleteTextView;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
@@ -35,6 +36,7 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public static String SYMBOL = "symbol";
     public static String NAME = "name";
+    public static String QUOTE_JSON = "quote_json";
     private Map<String, String> symbolToName;
 
     private static String DEBUG_TAG = "MainActivity";
@@ -138,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
-     * AsyncTask to do a get request. The code is adapted from
+     * AsyncTask to do a lookup request. The code is adapted from
      * http://developer.android.com/training/basics/network-ops/connecting.html
      */
     private class AutoCompleteRequestTask extends AsyncTask<String, Void, String> {
@@ -184,6 +186,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.d(DEBUG_TAG, "autocomplete request had no results or request was cancelled");
             } catch (IllegalStateException e) {
                 Log.d(DEBUG_TAG, "autocomplete request had no results or request was cancelled");
+            }
+        }
+    }
+
+    /**
+     * AsyncTask to do a quote request. The code is adapted from
+     * http://developer.android.com/training/basics/network-ops/connecting.html
+     */
+    private class QuoteRequestTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... urls) {
+            try {
+                return downloadUrl(urls[0]);
+            } catch (IOException e) {
+                return "Unable to retrieve web page. URL may be invalid.";
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            Log.d(DEBUG_TAG, "Got quote json=" + result);
+            try {
+                // Check for success
+                Gson gson = new Gson();
+                JsonParser parser = new JsonParser();
+                JsonObject quote = parser.parse(result).getAsJsonObject();
+                if (gson.fromJson(quote.get("Status"), String.class).equals("SUCCESS")) {
+                    Log.d(DEBUG_TAG, "Status was success, starting result activity.");
+                    Intent intent = new Intent(MainActivity.this, ResultActivity.class);
+                    intent.putExtra(MainActivity.NAME, "TODO parse in result side");
+                    intent.putExtra(MainActivity.QUOTE_JSON, result);
+                    startActivity(intent);
+                } else {
+                    Log.d(DEBUG_TAG, "Status was NOT success, can't start result activity.");
+                    makeAlert("Invalid Symbol");
+                }
+            } catch (JsonParseException e) {
+                Log.d(DEBUG_TAG, "Quote request had no results");
+                makeAlert("Invalid Symbol");
+            } catch (IllegalStateException e) {
+                Log.d(DEBUG_TAG, "Quote request had no results");
+                makeAlert("Invalid Symbol");
             }
         }
     }
@@ -245,17 +289,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * If it's a valid search, get the quote
      */
     private void getQuote() {
-        String input = textView.getText().toString().trim();
+        //TODO change back after debug
+        String input = "AAPL";//textView.getText().toString().trim();
         Log.d(DEBUG_TAG, "Get Quote clicked, input=" + input);
         // Check for blank input
-        if (input.isEmpty()) {
+        if (false && input.isEmpty()) {
             makeAlert("Please enter a Stock Name/Symbol");
+        } else {
+            String url = "https://inspired-photon-127022.appspot.com/stock-api.php?symbol=" + input;
+            new QuoteRequestTask().execute(url);
         }
-        //TODO request quote and pass the JSON data instead!
-        Intent intent = new Intent(MainActivity.this, ResultActivity.class);
-        intent.putExtra(MainActivity.SYMBOL, input);
-        intent.putExtra(MainActivity.NAME, symbolToName.get(input));
-        startActivity(intent);
     }
 
     /**
