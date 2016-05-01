@@ -3,6 +3,7 @@ package com.connorkerns.csci571_stocks;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -28,8 +29,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    public static String SYMBOL = "symbol";
+    public static String NAME = "name";
+    private Map<String, String> symbolToName;
+
     private static String DEBUG_TAG = "MainActivity";
     private View clearButton;
     private View quoteButton;
@@ -81,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //TODO this is a little sketch
                 String item = p.getItemAtPosition(pos).toString();
                 String ticker = item.substring(0, item.indexOf(' '));
+                String name = item.substring(item.indexOf('-') + 1, item.indexOf('(') - 1);
                 Log.d(DEBUG_TAG, "Clicked on list item=" + ticker);
                 // Disable adapter temporarily to avoid popup
                 ignoreAutoComplete = true;
@@ -89,6 +97,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 int position = ticker.length();
                 Editable etext = textView.getEditableText();
                 Selection.setSelection(etext, position);
+
+                symbolToName.put(ticker, name);
             }
         });
         textView.setOnTouchListener(new View.OnTouchListener() {
@@ -99,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+        symbolToName = new HashMap<String, String>();
         refreshFavorites();
     }
 
@@ -240,7 +251,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (input.isEmpty()) {
             makeAlert("Please enter a Stock Name/Symbol");
         }
-        //TODO request quote
+        //TODO request quote and pass the JSON data instead!
+        Intent intent = new Intent(MainActivity.this, ResultActivity.class);
+        intent.putExtra(MainActivity.SYMBOL, input);
+        intent.putExtra(MainActivity.NAME, symbolToName.get(input));
+        startActivity(intent);
     }
 
     /**

@@ -11,4 +11,7 @@
     <string name="label_news">NEWS</string>
     <string name="label_stock_details">Stock Details</string>
     <string name="label_news_feed">News Feed</string>
+    <string name="title_activity_result">ResultActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
 </resources>
