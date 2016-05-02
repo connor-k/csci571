@@ -2,7 +2,10 @@ package com.connorkerns.csci571_stocks;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -11,6 +14,9 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,13 +30,18 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import com.squareup.picasso.Picasso;
+
+import java.io.IOException;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class ResultActivity extends AppCompatActivity {
+    private static String DEBUG_TAG = "ResultActivity";
     private static String symbol;
     private static String name;
     private static String quoteJson;
@@ -142,7 +153,6 @@ public class ResultActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_current, container, false);
             LinearLayout details = (LinearLayout) rootView.findViewById(R.id.stock_details_list);
-            View child = inflater.inflate(R.layout.list_item_details, container, false);
 
             // Parse the JSON and add all the list items
             Gson gson = new Gson();
@@ -221,16 +231,6 @@ public class ResultActivity extends AppCompatActivity {
                             ViewGroup.LayoutParams.MATCH_PARENT,
                             ViewGroup.LayoutParams.MATCH_PARENT));
                     builder.show();
-
-                    /*
-                    Dialog.Builder builder = new Dialog.Builder(getActivity());
-                    final AlertDialog dialog = builder.create();
-                    LinearLayout parent = new LinearLayout(getContext());
-                    ImageView other = imageView;
-                    parent.addView(other);
-                    dialog.setView(parent);
-                    dialog.show();
-                    */
                 }
             });
 
@@ -268,7 +268,7 @@ public class ResultActivity extends AppCompatActivity {
             webView.getSettings().setJavaScriptEnabled(true);
             String baseURL = "https://inspired-photon-127022.appspot.com/";
             String html = "<!DOCTYPE html><meta charset=utf-8><script src=https://code.jquery.com/jquery.min.js></script><script src=https://code.highcharts.com/stock/highstock.js></script><script src=https://code.highcharts.com/stock/modules/exporting.js></script><div id=chart-container style=\"min-width:310px;height:400px;margin:0 auto\"></div><script>function chartFixDate(t){var e=new Date(t);return Date.UTC(e.getFullYear(),e.getMonth(),e.getDate())}function chartGetOHLC(t){var e=t.Dates||[],a=t.Elements||[],o=[];if(a[0])for(var r=0,s=e.length;s>r;r++){var n=chartFixDate(e[r]),l=[n,a[0].DataSeries.open.values[r],a[0].DataSeries.high.values[r],a[0].DataSeries.low.values[r],a[0].DataSeries.close.values[r]];o.push(l)}return o}var symbol=\"";
-            html += symbol;
+            html += ResultActivity.symbol;
             html +="\";$.ajax({url:\"https://inspired-photon-127022.appspot.com/stock-api.php\",data:{chart:symbol},success:function(t){try{d=t,js_data=JSON.parse(t),$(\"#chart-container\").highcharts(\"StockChart\",{rangeSelector:{buttons:[{type:\"week\",count:1,text:\"1w\"},{type:\"month\",count:1,text:\"1m\"},{type:\"month\",count:3,text:\"3m\"},{type:\"month\",count:6,text:\"6m\"},{type:\"ytd\",text:\"YTD\"},{type:\"year\",count:1,text:\"1y\"},{type:\"all\",text:\"All\"}],selected:0,inputEnabled:!1},title:{text:symbol+\" Stock Value\"},navigation:{buttonOptions:{enabled:!1}},yAxis:{title:{text:\"Stock Value\"}},series:[{name:symbol+\": $\",data:chartGetOHLC(js_data),type:\"area\",threshold:null,tooltip:{valueDecimals:2,valuePrefix:\"$\"},fillColor:{linearGradient:{x1:0,y1:0,x2:0,y2:1},stops:[[0,Highcharts.getOptions().colors[0]],[1,Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get(\"rgba\")]]}}]})}catch(e){return console.log(\"Note: Markit on Demand queries exceeded, please wait and try again.\"),!1}}})</script>";
             webView.loadDataWithBaseURL(baseURL, html, "text/html", "utf-8", null);
 
@@ -282,9 +282,13 @@ public class ResultActivity extends AppCompatActivity {
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+        // TODO not great..
+        public static NewsFragment instance;
+        private static LinearLayout newsList;
+        private static LayoutInflater inflater;
+        private static ViewGroup container;
 
-        public NewsFragment() {
-        }
+        public NewsFragment() {}
 
         /**
          * Returns a new instance of this fragment for the given section
@@ -298,14 +302,89 @@ public class ResultActivity extends AppCompatActivity {
             return fragment;
         }
 
+        public void addDetailItem(final String url, String title, String content, String publisher, String date) {
+            View child = inflater.inflate(R.layout.list_item_news, container, false);
+            SpannableString titleUnderlined = new SpannableString(title);
+            titleUnderlined.setSpan(new UnderlineSpan(), 0, titleUnderlined.length(), 0);
+            ((TextView)child.findViewById(R.id.newsItemTitle)).setText(titleUnderlined);
+            // Make the title a link to the news url
+            ((TextView)child.findViewById(R.id.newsItemTitle)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(url));
+                    startActivity(i);
+                }
+            });
+            ((TextView)child.findViewById(R.id.newsItemContent)).setText(content);
+            ((TextView)child.findViewById(R.id.newsItemPublisher)).setText(publisher);
+            ((TextView)child.findViewById(R.id.newsItemDate)).setText(date);
+            NewsFragment.newsList.addView(child);
+        }
+
+        public void addDivider() {
+            View child = inflater.inflate(R.layout.divider, NewsFragment.container, false);
+            NewsFragment.newsList.addView(child);
+        }
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_result, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            NewsFragment.instance = this;
+            View rootView = inflater.inflate(R.layout.fragment_news, container, false);
+            NewsFragment.newsList = (LinearLayout) rootView.findViewById(R.id.stock_news_list);
+            NewsFragment.inflater = inflater;
+            NewsFragment.container = container;
+            String url = "https://inspired-photon-127022.appspot.com/stock-api.php?news="
+                    + ResultActivity.symbol;
+            new NewsRequestTask().execute(url);
 
             return rootView;
+        }
+
+        /**
+         * AsyncTask to do a news feed request. The code is adapted from
+         * http://developer.android.com/training/basics/network-ops/connecting.html
+         */
+        private class NewsRequestTask extends AsyncTask<String, Void, String> {
+            @Override
+            protected String doInBackground(String... urls) {
+                try {
+                    return Downloader.downloadUrl(urls[0]);
+                } catch (IOException e) {
+                    return "Unable to retrieve web page. URL may be invalid.";
+                }
+            }
+
+            @Override
+            protected void onPostExecute(String result) {
+                Log.d(DEBUG_TAG, "Got news json=" + result);
+                try {
+                    // Check for success
+                    Gson gson = new Gson();
+                    JsonParser parser = new JsonParser();
+                    JsonObject news = parser.parse(result).getAsJsonObject().getAsJsonObject("d");
+                    JsonArray results = news.getAsJsonArray("results");
+
+                    for (int i = 0; i < results.size(); ++i) {
+                        JsonObject newsItem = results.get(i).getAsJsonObject();
+                        String url = gson.fromJson(newsItem.get("Url"), String.class);
+                        String title = gson.fromJson(newsItem.get("Title"), String.class);
+                        String content = gson.fromJson(newsItem.get("Description"), String.class);
+                        String publisher = gson.fromJson(newsItem.get("Source"), String.class);
+                        String date = gson.fromJson(newsItem.get("Date"), String.class);
+                        //TODO convert date?
+                        NewsFragment.instance.addDetailItem(url, title, content, publisher, date);
+                        if (i != results.size() - 1) {
+                            NewsFragment.instance.addDivider();
+                        }
+                    }
+                } catch (JsonParseException e) {
+                    Log.d(DEBUG_TAG, "News request had no results");
+                } catch (IllegalStateException e) {
+                    Log.d(DEBUG_TAG, "News request had no results");
+                }
+            }
         }
     }
 
