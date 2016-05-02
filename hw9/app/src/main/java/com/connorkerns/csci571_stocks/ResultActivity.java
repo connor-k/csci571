@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -30,8 +31,8 @@ import com.squareup.picasso.Picasso;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 public class ResultActivity extends AppCompatActivity {
-    private String symbol;
-    private String name;
+    private static String symbol;
+    private static String name;
     private static String quoteJson;
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -73,6 +74,7 @@ public class ResultActivity extends AppCompatActivity {
         JsonParser parser = new JsonParser();
         JsonObject quote = parser.parse(quoteJson).getAsJsonObject();
 
+        symbol = gson.fromJson(quote.get("Symbol"), String.class);
         name = gson.fromJson(quote.get("Name"), String.class);
         setTitle(name);
     }
@@ -261,9 +263,14 @@ public class ResultActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_result, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+            View rootView = inflater.inflate(R.layout.fragment_historical, container, false);
+            WebView webView = (WebView) rootView.findViewById(R.id.historical_webView);
+            webView.getSettings().setJavaScriptEnabled(true);
+            String baseURL = "https://inspired-photon-127022.appspot.com/";
+            String html = "<!DOCTYPE html><meta charset=utf-8><script src=https://code.jquery.com/jquery.min.js></script><script src=https://code.highcharts.com/stock/highstock.js></script><script src=https://code.highcharts.com/stock/modules/exporting.js></script><div id=chart-container style=\"min-width:310px;height:400px;margin:0 auto\"></div><script>function chartFixDate(t){var e=new Date(t);return Date.UTC(e.getFullYear(),e.getMonth(),e.getDate())}function chartGetOHLC(t){var e=t.Dates||[],a=t.Elements||[],o=[];if(a[0])for(var r=0,s=e.length;s>r;r++){var n=chartFixDate(e[r]),l=[n,a[0].DataSeries.open.values[r],a[0].DataSeries.high.values[r],a[0].DataSeries.low.values[r],a[0].DataSeries.close.values[r]];o.push(l)}return o}var symbol=\"";
+            html += symbol;
+            html +="\";$.ajax({url:\"https://inspired-photon-127022.appspot.com/stock-api.php\",data:{chart:symbol},success:function(t){try{d=t,js_data=JSON.parse(t),$(\"#chart-container\").highcharts(\"StockChart\",{rangeSelector:{buttons:[{type:\"week\",count:1,text:\"1w\"},{type:\"month\",count:1,text:\"1m\"},{type:\"month\",count:3,text:\"3m\"},{type:\"month\",count:6,text:\"6m\"},{type:\"ytd\",text:\"YTD\"},{type:\"year\",count:1,text:\"1y\"},{type:\"all\",text:\"All\"}],selected:0,inputEnabled:!1},title:{text:symbol+\" Stock Value\"},navigation:{buttonOptions:{enabled:!1}},yAxis:{title:{text:\"Stock Value\"}},series:[{name:symbol+\": $\",data:chartGetOHLC(js_data),type:\"area\",threshold:null,tooltip:{valueDecimals:2,valuePrefix:\"$\"},fillColor:{linearGradient:{x1:0,y1:0,x2:0,y2:1},stops:[[0,Highcharts.getOptions().colors[0]],[1,Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get(\"rgba\")]]}}]})}catch(e){return console.log(\"Note: Markit on Demand queries exceeded, please wait and try again.\"),!1}}})</script>";
+            webView.loadDataWithBaseURL(baseURL, html, "text/html", "utf-8", null);
 
             return rootView;
         }
