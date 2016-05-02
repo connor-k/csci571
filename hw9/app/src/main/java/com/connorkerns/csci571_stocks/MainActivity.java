@@ -8,6 +8,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.Html;
@@ -27,14 +28,11 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public static String SYMBOL = "symbol";
     public static String NAME = "name";
     public static String QUOTE_JSON = "quote_json";
-    private Map<String, String> symbolToName;
 
     private static String DEBUG_TAG = "MainActivity";
     private View clearButton;
@@ -87,7 +85,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //TODO this is a little sketch
                 String item = p.getItemAtPosition(pos).toString();
                 String ticker = item.substring(0, item.indexOf(' '));
-                String name = item.substring(item.indexOf('-') + 1, item.indexOf('(') - 1);
                 Log.d(DEBUG_TAG, "Clicked on list item=" + ticker);
                 // Disable adapter temporarily to avoid popup
                 ignoreAutoComplete = true;
@@ -96,8 +93,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 int position = ticker.length();
                 Editable etext = textView.getEditableText();
                 Selection.setSelection(etext, position);
-
-                symbolToName.put(ticker, name);
             }
         });
         textView.setOnTouchListener(new View.OnTouchListener() {
@@ -108,8 +103,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        symbolToName = new HashMap<String, String>();
-        refreshFavorites();
+        // Add app icon to status bar
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setLogo(R.mipmap.ic_launcher);
+        actionBar.setDisplayUseLogoEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
     }
 
     @Override
