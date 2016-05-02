@@ -143,6 +143,19 @@ public class ResultActivity extends AppCompatActivity {
             parent.addView(child);
         }
 
+        private void addDetailItem(LinearLayout parent, String label, String value,
+                                   LayoutInflater inflater, ViewGroup container, boolean up) {
+            View child;
+            if (up) {
+                child = inflater.inflate(R.layout.list_item_details_up, container, false);
+            } else {
+                child = inflater.inflate(R.layout.list_item_details_down, container, false);
+            }
+            ((TextView)child.findViewById(R.id.detailsItemLabel)).setText(label);
+            ((TextView)child.findViewById(R.id.detailsItemValue)).setText(value);
+            parent.addView(child);
+        }
+
         private void addDivider(LinearLayout parent, LayoutInflater inflater, ViewGroup container) {
             View child = inflater.inflate(R.layout.divider, container, false);
             parent.addView(child);
@@ -174,8 +187,7 @@ public class ResultActivity extends AppCompatActivity {
             value = gson.fromJson(quote.get("ChangePercent"), Double.class);
             //TODO check +
             display += "(" + String.format("%.2f", value) + "%)";
-            //TODO use positive for the arrow image
-            addDetailItem(details, "Change", display, inflater, container);
+            addDetailItem(details, "Change", display, inflater, container, positive);
             addDivider(details, inflater, container);
 
             addDetailItem(details, "TIMESTAMP", gson.fromJson(quote.get("Timestamp"), String.class), inflater, container);
@@ -193,7 +205,7 @@ public class ResultActivity extends AppCompatActivity {
             value = gson.fromJson(quote.get("ChangePercentYTD"), Double.class);
             display += "(" + String.format("%.2f", value) + "%)";
             //TODO use positive for the arrow image
-            addDetailItem(details, "CHANGEYTD", display, inflater, container);
+            addDetailItem(details, "CHANGEYTD", display, inflater, container, positive);
             addDivider(details, inflater, container);
 
             addDetailItem(details, "HIGH", gson.fromJson(quote.get("High"), String.class), inflater, container);
@@ -337,7 +349,8 @@ public class ResultActivity extends AppCompatActivity {
             NewsFragment.container = container;
             String url = "https://inspired-photon-127022.appspot.com/stock-api.php?news="
                     + ResultActivity.symbol;
-            new NewsRequestTask().execute(url);
+            //TODO uncomment later, for now comment to reduce queries
+            //new NewsRequestTask().execute(url);
 
             return rootView;
         }
