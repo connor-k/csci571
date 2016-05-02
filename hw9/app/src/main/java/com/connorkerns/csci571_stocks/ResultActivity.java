@@ -106,7 +106,13 @@ public class ResultActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_favorite) {
+            Log.d(DEBUG_TAG, "Favorite toggled");
+            //TODO
+            return true;
+        } else if (id == R.id.action_facebook) {
+            Log.d(DEBUG_TAG, "Facebook share button clicked");
+            //TODO
             return true;
         }
 
@@ -204,7 +210,6 @@ public class ResultActivity extends AppCompatActivity {
             display = String.format("%.2f", value);
             value = gson.fromJson(quote.get("ChangePercentYTD"), Double.class);
             display += "(" + String.format("%.2f", value) + "%)";
-            //TODO use positive for the arrow image
             addDetailItem(details, "CHANGEYTD", display, inflater, container, positive);
             addDivider(details, inflater, container);
 

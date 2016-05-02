@@ -3,8 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.connorkerns.csci571_stocks.ResultActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_favorite"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:title="@string/action_favorite"
+        android:icon="@android:drawable/star_off"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_facebook"
+        android:orderInCategory="101"
+        android:title="@string/action_favorite"
+        android:icon="@android:drawable/ic_menu_share"
+        app:showAsAction="always" />
+    <!-- TODO facebook icon -->
 </menu>
