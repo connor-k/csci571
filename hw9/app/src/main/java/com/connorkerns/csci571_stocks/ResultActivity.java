@@ -29,7 +29,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.share.Sharer;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -45,7 +53,33 @@ public class ResultActivity extends AppCompatActivity {
     private static String DEBUG_TAG = "ResultActivity";
     private static String symbol;
     private static String name;
+    private static String lastPrice;
+    private static String changeStr;
     private static String quoteJson;
+    private CallbackManager callbackManager;
+    private ShareDialog shareDialog;
+    private FacebookCallback<Sharer.Result> shareCallback = new FacebookCallback<Sharer.Result>() {
+        @Override
+        public void onSuccess(Sharer.Result result) {
+            Log.d(DEBUG_TAG, "Facebook Dialog Callback SUCCESS");
+            Log.d(DEBUG_TAG, "Post id: " + result.getPostId());
+            // Display a toast with not posted if that's the case
+            if (result.getPostId() == null) {
+                Toast.makeText(ResultActivity.this, "Post NOT shared", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onCancel() {
+            Log.d(DEBUG_TAG, "Facebook Dialog Callback CANCEL");
+        }
+
+        @Override
+        public void onError(FacebookException error) {
+            Log.d(DEBUG_TAG, "Facebook Dialog Callback ERROR");
+        }
+    };
+
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -95,8 +129,18 @@ public class ResultActivity extends AppCompatActivity {
         symbol = gson.fromJson(quote.get("Symbol"), String.class);
         name = gson.fromJson(quote.get("Name"), String.class);
         setTitle(name);
+
+        // Initialize Facebook SDK for sharing
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        callbackManager = CallbackManager.Factory.create();
     }
 
+    @Override
+    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(DEBUG_TAG, "onActivityResult data: " + requestCode + " " + resultCode + " " + data.getExtras());
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -120,6 +164,23 @@ public class ResultActivity extends AppCompatActivity {
         } else if (id == R.id.action_facebook) {
             Log.d(DEBUG_TAG, "Facebook share button clicked");
             //TODO
+            shareDialog = new ShareDialog(this);
+            shareDialog.registerCallback(callbackManager, shareCallback);
+            //TODO not quite right -- remove quote and change the url caption to be the current quote
+            if (ShareDialog.canShow(ShareLinkContent.class)) {
+                ShareLinkContent linkContent = new ShareLinkContent.Builder()
+                        .setContentTitle("Current Stock Price of " + ResultActivity.name + " is $"
+                                + ResultActivity.lastPrice)
+                        .setQuote("Stock Information of " + ResultActivity.name + " ("
+                                + ResultActivity.symbol + ")")
+                        .setContentDescription("Last Traded Price: $ " + ResultActivity.lastPrice
+                                + ", Change: " + ResultActivity.changeStr)
+                        .setImageUrl(Uri.parse("https://chart.yahoo.com/t?s=" + ResultActivity.symbol
+                                + "&lang=en-US&width=400&height=300"))
+                        .setContentUrl(Uri.parse("https://finance.yahoo.com/q?s=" + symbol))
+                        .build();
+                shareDialog.show(linkContent);
+            }
             return true;
         }
 
@@ -191,7 +252,8 @@ public class ResultActivity extends AppCompatActivity {
             addDetailItem(details, "SYMBOL", symbol, inflater, container);
             addDivider(details, inflater, container);
 
-            addDetailItem(details, "LASTPRICE", gson.fromJson(quote.get("LastPrice"), String.class), inflater, container);
+            lastPrice = gson.fromJson(quote.get("LastPrice"), String.class);
+            addDetailItem(details, "LASTPRICE", lastPrice, inflater, container);
             addDivider(details, inflater, container);
 
             Double value = gson.fromJson(quote.get("Change"), Double.class);
@@ -200,6 +262,7 @@ public class ResultActivity extends AppCompatActivity {
             value = gson.fromJson(quote.get("ChangePercent"), Double.class);
             //TODO check +
             display += "(" + String.format("%.2f", value) + "%)";
+            changeStr = display;
             addDetailItem(details, "Change", display, inflater, container, positive);
             addDivider(details, inflater, container);
 
