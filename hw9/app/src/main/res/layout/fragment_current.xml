@@ -12,7 +12,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/label_stock_details"
-            android:color="#000000"
+            android:color="@android:color/black"
             android:textAlignment="center" />
 
         <LinearLayout
@@ -27,7 +27,7 @@
             android:paddingTop="16dip"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/label_day_chart"
-            android:color="#000000"
+            android:color="@android:color/black"
             android:textStyle="bold" />
 
         <ImageView

@@ -6,7 +6,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.connorkerns.csci571_stocks.ResultActivity$PlaceholderFragment">
+    tools:context="com.connorkerns.csci571_stocks.ResultActivity$CurrentFragment">
 
     <TextView
         android:id="@+id/section_label"

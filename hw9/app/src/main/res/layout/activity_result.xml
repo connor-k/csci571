@@ -28,7 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dip"
-        android:theme="@style/AppTheme.TabStyle" />
+        android:theme="@style/AppTheme.TabStyle"/>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/container"

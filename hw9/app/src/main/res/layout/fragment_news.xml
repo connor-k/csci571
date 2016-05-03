@@ -12,7 +12,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="@string/label_news_feed"
-            android:color="#000000"
+            android:color="@android:color/black"
             android:textAlignment="center" />
 
         <LinearLayout
