@@ -11,6 +11,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -21,6 +22,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -30,10 +32,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.OnDismissCallback;
 
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public static String SYMBOL = "symbol";
@@ -45,6 +50,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private View quoteButton;
     private View refreshButton;
     private AutoCompleteTextView textView;
+    private ArrayList<String> favoriteItemList;
+    private DynamicListView dynamicListView;
+    private ArrayAdapter<String> adapter;
     private Boolean ignoreAutoComplete = false;
     private AsyncTask autoCompleteTask = null;
 
@@ -79,8 +87,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         refreshButton = findViewById(R.id.button_refresh);
         refreshButton.setOnClickListener(this);
         textView = (AutoCompleteTextView)findViewById(R.id.auto_complete_text_view);
-        // Show suggestions for every char entered
-        textView.setThreshold(1);
+        // Show suggestions only after >=3 chars entered
+        textView.setThreshold(3);
         // Listen for key presses for autocomplete
         TextWatcher autocompleteWatcher = new TextWatcher() {
             @Override
@@ -125,6 +133,57 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 return false;
             }
         });
+
+        dynamicListView = (DynamicListView)findViewById(R.id.dynamiclistview);
+        favoriteItemList = new ArrayList<String>();
+        favoriteItemList.add("test1");
+        favoriteItemList.add("test2");
+        favoriteItemList.add("test3");
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, favoriteItemList);
+        dynamicListView.setAdapter(adapter);
+
+        // Enable swipe to dismiss
+        dynamicListView.enableSwipeToDismiss(
+            new OnDismissCallback() {
+                @Override
+                public void onDismiss(@NonNull final ViewGroup listView, @NonNull final int[] reverseSortedPositions) {
+                    for (final int position : reverseSortedPositions) {
+                        AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                        //TODO real message
+                        alertDialog.setMessage("Want to delete " + "Apple Inc" + " from favorites?");
+                        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                            Log.d(DEBUG_TAG, "Tried to remove item " + position);
+                            Log.d(DEBUG_TAG, "Value: " + adapter.getItem(position));
+                            favoriteItemList.remove(position);
+                            adapter.notifyDataSetChanged();
+                            }
+                        });
+                        alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                            //Dismiss
+                            }
+                        });
+                        alertDialog.show();
+                    }
+                }
+            }
+        );
+/*
+        //ArrayLi myAdapter = new MyAdapter();
+        SimpleSwipeUndoAdapter swipeUndoAdapter = new SimpleSwipeUndoAdapter(adapter, MainActivity.this,
+            new OnDismissCallback() {
+                @Override
+                public void onDismiss(@NonNull final ViewGroup listView, @NonNull final int[] reverseSortedPositions) {
+                    for (int position : reverseSortedPositions) {
+                        adapter.remove(adapter.getItem(position));
+                    }
+                }
+            }
+        );
+        swipeUndoAdapter.setAbsListView(dynamicListView);
+        dynamicListView.setAdapter(swipeUndoAdapter);
+        dynamicListView.enableSimpleSwipeUndo();*/
 
         // Add app icon to status bar
         ActionBar actionBar = getSupportActionBar();

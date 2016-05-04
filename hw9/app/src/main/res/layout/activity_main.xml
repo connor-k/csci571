@@ -12,7 +12,7 @@
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -37,7 +37,7 @@
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="8dp">
 
             <Button
@@ -57,7 +57,7 @@
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="12dp">
 
             <TextView
@@ -87,4 +87,14 @@
                 android:contentDescription="@string/label_refresh"
                 android:background="@drawable/ic_refresh_black" />
         </TableRow>
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.nhaarman.listviewanimations.itemmanipulation.DynamicListView
+            android:id="@+id/dynamiclistview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </TableRow>
 </TableLayout>
