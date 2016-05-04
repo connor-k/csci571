@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.CompoundButton;
 import android.widget.Switch;
 
 import com.google.gson.Gson;
@@ -64,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Lock favoritesLock;
     private int favoritesUpdateCount = 0;
     private ProgressDialog progressDialog;
+    private static boolean autorefresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +95,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         clearButton.setOnClickListener(this);
         quoteButton = findViewById(R.id.button_get_quote);
         quoteButton.setOnClickListener(this);
+        MainActivity.autorefresh = false;
         refreshSwitch = (Switch)findViewById(R.id.refreshSwitch);
+        refreshSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                MainActivity.autorefresh = isChecked;
+                Log.d(DEBUG_TAG, "Set autorefresh to " + MainActivity.autorefresh);
+            }
+        });
         refreshButton = findViewById(R.id.button_refresh);
         refreshButton.setOnClickListener(this);
         textView = (AutoCompleteTextView)findViewById(R.id.auto_complete_text_view);
@@ -198,11 +208,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         (new Thread(new Runnable() {
             @Override
             public void run() {
-                while (!Thread.interrupted()) {
+                while (true) {
                     try {
                         // Every 10 seconds check if should refresh
-                        Thread.sleep(10*1000);
-                        if (refreshSwitch.isChecked()) {
+                        Thread.sleep(2*1000);
+                        if (MainActivity.autorefresh) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
