@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (ignoreAutoComplete) {
                     ignoreAutoComplete = false;
                     textView.dismissDropDown();
-                } else {
+                } else if (textView.getText().length() >= 3) {
                     doAutoCompleteLookup();
                 }
             }
