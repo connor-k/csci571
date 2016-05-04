@@ -76,11 +76,12 @@ class FavoritesArrayAdapter extends ArrayAdapter<FavoriteItem> {
                 priceText.setText("$ " + i.price);
             }
             if (changePercentText != null) {
-                changePercentText.setText(i.changePercent + "%");
                 if (!i.changePercent.isEmpty()) {
                     if (Double.parseDouble(i.changePercent) > 0.0) {
+                        changePercentText.setText("+" + i.changePercent + "%");
                         changePercentText.setBackgroundColor(getContext().getResources().getColor(android.R.color.holo_green_light));
                     } else {
+                        changePercentText.setText(i.changePercent + "%");
                         changePercentText.setBackgroundColor(getContext().getResources().getColor(android.R.color.holo_red_light));
                     }
                 }

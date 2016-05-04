@@ -281,8 +281,7 @@ public class ResultActivity extends AppCompatActivity {
             boolean positive = value > 0.0;
             String display = String.format("%.2f", value);
             value = gson.fromJson(quote.get("ChangePercent"), Double.class);
-            //TODO check +
-            display += "(" + String.format("%.2f", value) + "%)";
+            display += "(" + (positive ? "+" : "") + String.format("%.2f", value) + "%)";
             changeStr = display;
             addDetailItem(details, "Change", display, inflater, container, positive);
             addDivider(details, inflater, container);

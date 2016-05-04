@@ -373,11 +373,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         for (int i = 0; i < favorites.size(); ++i) {
             FavoriteItem fi = new FavoriteItem(favorites.get(i));
             favoriteItemList.add(fi);
+        }
+        for (int i = 0; i < favoriteItemList.size(); ++i) {
             // Asynchronously do the lookup
+            //TODO only refresh price/change and not everything
             favoritesLock.lock();
             ++favoritesUpdateCount;
             favoritesLock.unlock();
-            new FavoriteRefresher(this, fi);
+            new FavoriteRefresher(this, favoriteItemList.get(i));
         }
     }
 
