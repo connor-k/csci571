@@ -56,6 +56,7 @@ public class ResultActivity extends AppCompatActivity {
     private static String lastPrice;
     private static String changeStr;
     private static String quoteJson;
+    private Menu menu;
     private CallbackManager callbackManager;
     private ShareDialog shareDialog;
     private FacebookCallback<Sharer.Result> shareCallback = new FacebookCallback<Sharer.Result>() {
@@ -135,6 +136,15 @@ public class ResultActivity extends AppCompatActivity {
         callbackManager = CallbackManager.Factory.create();
     }
 
+    private void setFavoriteIcon() {
+        Log.d(DEBUG_TAG, "Setting favorite menu icon");
+        if (FavoritesManager.isFavorite(ResultActivity.this, ResultActivity.symbol)) {
+            menu.getItem(0).setIcon(getResources().getDrawable(android.R.drawable.star_on, getTheme()));
+        } else {
+            menu.getItem(0).setIcon(getResources().getDrawable(android.R.drawable.star_off, getTheme()));
+        }
+    }
+
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -146,6 +156,8 @@ public class ResultActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_result, menu);
+        this.menu = menu;
+        setFavoriteIcon();
         return true;
     }
 
@@ -159,10 +171,19 @@ public class ResultActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_favorite) {
             Log.d(DEBUG_TAG, "Favorite toggled");
-            //TODO
+            if (FavoritesManager.isFavorite(ResultActivity.this, ResultActivity.symbol)) {
+                FavoritesManager.removeFavorite(ResultActivity.this, ResultActivity.symbol);
+                // Toast at 1:23
+                Toast.makeText(ResultActivity.this, "Bookmarked " + ResultActivity.name + "!!", Toast.LENGTH_SHORT);
+            } else {
+                FavoritesManager.addFavorite(ResultActivity.this, ResultActivity.symbol);
+            }
+            setFavoriteIcon();
             return true;
         } else if (id == R.id.action_facebook) {
             Log.d(DEBUG_TAG, "Facebook share button clicked");
+            // Toast at 1:27
+            Toast.makeText(ResultActivity.this, "Sharing " + ResultActivity.name + "!!", Toast.LENGTH_SHORT);
             //TODO
             shareDialog = new ShareDialog(this);
             shareDialog.registerCallback(callbackManager, shareCallback);
