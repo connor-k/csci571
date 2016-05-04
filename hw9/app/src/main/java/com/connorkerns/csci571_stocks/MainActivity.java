@@ -40,6 +40,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public static String SYMBOL = "symbol";
@@ -56,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FavoritesArrayAdapter adapter;
     private Boolean ignoreAutoComplete = false;
     private AsyncTask autoCompleteTask = null;
+    private Lock favoritesLock;
+    private int favoritesUpdateCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,12 +141,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         dynamicListView = (DynamicListView)findViewById(R.id.dynamiclistview);
         favoriteItemList = new ArrayList<FavoriteItem>();
-        favoriteItemList.add(new FavoriteItem("AAPL", "Apple Inc", "109.99", "+1.02", "609.80 Billion"));
-        favoriteItemList.add(new FavoriteItem("GOOG", "Alphabet Inc", "109.99", "-1.02", "609.80 Billion"));
-        favoriteItemList.add(new FavoriteItem("TSLA", "Tesla Inc", "109.99", "+1.02", "609.80 Billion"));
         adapter = new FavoritesArrayAdapter(this, R.layout.list_item_favorites, favoriteItemList);
         dynamicListView.setAdapter(adapter);
-
         // Enable swipe to dismiss
         dynamicListView.enableSwipeToDismiss(
             new OnDismissCallback() {
@@ -156,6 +156,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.d(DEBUG_TAG, "Tried to remove item " + position);
                                 //Log.d(DEBUG_TAG, "Value: " + adapter.getItem(position));
+                                FavoritesManager.removeFavorite(MainActivity.this, favoriteItemList.get(position).symbol);
                                 favoriteItemList.remove(position);
                                 adapter.notifyDataSetChanged();
                             }
@@ -170,12 +171,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         );
+        dynamicListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position < favoriteItemList.size()) {
+                    String url = "https://inspired-photon-127022.appspot.com/stock-api.php?symbol=" + favoriteItemList.get(position).symbol;
+                    new QuoteRequestTask().execute(url);
+                }
+            }
+        });
 
         // Add app icon to status bar
         ActionBar actionBar = getSupportActionBar();
         actionBar.setLogo(R.mipmap.ic_launcher);
         actionBar.setDisplayUseLogoEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
+
+        favoritesLock = new ReentrantLock();
     }
 
     @Override
@@ -340,22 +352,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //TODO spinner animation?
         List<String> favorites = FavoritesManager.getFavorites(this);
         // Refresh data for all favorites
-        favoriteItemList.clear();
-        for (int i = 0; i < favorites.size(); ++i) {
-            if (!favoriteItemList.contains(favorites.get(i))) {
-                FavoriteItem fi = new FavoriteItem(favorites.get(i));
-                favoriteItemList.add(fi);
-                // Asynchronously do the lookup
-                new FavoriteRefresher(this, fi);
-            } else {
+        favoritesLock.lock();
+        Log.d(DEBUG_TAG, "Currently waiting for " + favoritesUpdateCount + " updates to finish.");
+        favoritesLock.unlock();
+        // Remove anything missing
+        for (int i = 0; i < favoriteItemList.size(); ++i) {
+            boolean found = false;
+            for (int j = 0; j < favorites.size(); ++j) {
+                if (favorites.get(j).equals(favoriteItemList.get(i).symbol)) {
+                    favorites.remove(j);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
                 favoriteItemList.remove(i);
                 --i;
             }
         }
+        for (int i = 0; i < favorites.size(); ++i) {
+            FavoriteItem fi = new FavoriteItem(favorites.get(i));
+            favoriteItemList.add(fi);
+            // Asynchronously do the lookup
+            favoritesLock.lock();
+            ++favoritesUpdateCount;
+            favoritesLock.unlock();
+            new FavoriteRefresher(this, fi);
+        }
     }
 
     public void notifyFavoritesChanged() {
-        adapter.notifyDataSetChanged();
+        // 1:43 updates look atomic and on going back all are reloaded!
+        favoritesLock.lock();
+        // TODO do I want update to be atomic?
+        if (--favoritesUpdateCount == 0) {
+            adapter.notifyDataSetChanged();
+        }
+        Log.d(DEBUG_TAG, "Received update. Waiting for " + favoritesUpdateCount);
+        favoritesLock.unlock();
     }
 
     /**

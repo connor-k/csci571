@@ -10,6 +10,15 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.connorkerns.csci571_stocks.MainActivity">
 
+    <!-- Dummy item to prevent AutoCompleteTextView from receiving focus -->
+    <LinearLayout
+        android:id="@+id/linearLayout_focus"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:layout_width="0px"
+        android:layout_height="0px"
+        android:orientation="horizontal"/>
+
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content">

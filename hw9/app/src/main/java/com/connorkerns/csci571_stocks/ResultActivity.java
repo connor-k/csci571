@@ -173,10 +173,10 @@ public class ResultActivity extends AppCompatActivity {
             Log.d(DEBUG_TAG, "Favorite toggled");
             if (FavoritesManager.isFavorite(ResultActivity.this, ResultActivity.symbol)) {
                 FavoritesManager.removeFavorite(ResultActivity.this, ResultActivity.symbol);
-                // Toast at 1:23
-                Toast.makeText(ResultActivity.this, "Bookmarked " + ResultActivity.name + "!!", Toast.LENGTH_SHORT);
             } else {
                 FavoritesManager.addFavorite(ResultActivity.this, ResultActivity.symbol);
+                // Toast at 1:23
+                Toast.makeText(ResultActivity.this, "Bookmarked " + ResultActivity.name + "!!", Toast.LENGTH_SHORT);
             }
             setFavoriteIcon();
             return true;

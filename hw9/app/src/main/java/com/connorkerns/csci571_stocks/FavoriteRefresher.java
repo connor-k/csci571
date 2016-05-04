@@ -49,11 +49,12 @@ public class FavoriteRefresher {
                 String changePercent = gson.fromJson(quote.get("ChangePercent"), String.class);
                 String marketCap = gson.fromJson(quote.get("MarketCap"), String.class);
                 favoriteItem.setAllData(favoriteItem.symbol, name, price, changePercent, marketCap);
-                mainActivity.notifyFavoritesChanged();
             } catch (JsonParseException e) {
                 Log.d(DEBUG_TAG, "Quote request had no results");
             } catch (IllegalStateException e) {
                 Log.d(DEBUG_TAG, "Quote request had no results");
+            } finally {
+                mainActivity.notifyFavoritesChanged();
             }
         }
     }

@@ -15,12 +15,14 @@ class FavoriteItem {
     String price;
     String changePercent;
     String marketCap;
+    boolean initialized;
     FavoriteItem(String s, String n, String p, String cp, String m) {
        setAllData(s, n, p, cp, m);
     }
 
     FavoriteItem(String s) {
         setAllData(s, "", "", "", "");
+        initialized = false;
     }
 
     public void setAllData(String s, String n, String p, String cp, String m) {
@@ -29,6 +31,7 @@ class FavoriteItem {
         price = p;
         changePercent = cp;
         marketCap = m;
+        initialized = true;
     }
 }
 
@@ -55,9 +58,9 @@ class FavoritesArrayAdapter extends ArrayAdapter<FavoriteItem> {
             v = vi.inflate(R.layout.list_item_favorites, null);
         }
 
-        FavoriteItem i = items.get(position);
+        final FavoriteItem i = items.get(position);
 
-        if (i != null) {
+        if (i != null && i.initialized) {
             TextView symbolText = (TextView)v.findViewById(R.id.favoritesSymbol);
             TextView nameText = (TextView)v.findViewById(R.id.favoritesName);
             TextView priceText = (TextView)v.findViewById(R.id.favoritesPrice);
