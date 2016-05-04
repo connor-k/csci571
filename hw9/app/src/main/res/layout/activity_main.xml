@@ -85,7 +85,10 @@
                 android:layout_height="match_parent"
                 android:id="@+id/button_refresh"
                 android:contentDescription="@string/label_refresh"
-                android:background="@drawable/ic_refresh_black" />
+                android:src="@drawable/ic_refresh_black"
+                android:scaleType="fitCenter"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true" />
         </TableRow>
     <TableRow
         android:layout_width="match_parent"
