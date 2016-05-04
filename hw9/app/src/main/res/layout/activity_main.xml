@@ -75,7 +75,6 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/label_favorites"
-                android:id="@+id/textView2"
                 android:textStyle="bold"
                 android:textColor="@android:color/black" />
 
@@ -84,7 +83,7 @@
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 android:text="@string/label_auto_refresh"
-                android:id="@+id/switch1"
+                android:id="@+id/refreshSwitch"
                 android:textAlignment="center" />
 
             <ImageButton

@@ -1,6 +1,7 @@
 package com.connorkerns.csci571_stocks;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,6 +27,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Switch;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static String DEBUG_TAG = "MainActivity";
     private View clearButton;
     private View quoteButton;
+    private Switch refreshSwitch;
     private View refreshButton;
     private AutoCompleteTextView textView;
     private ArrayList<FavoriteItem> favoriteItemList;
@@ -60,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private AsyncTask autoCompleteTask = null;
     private Lock favoritesLock;
     private int favoritesUpdateCount = 0;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         clearButton.setOnClickListener(this);
         quoteButton = findViewById(R.id.button_get_quote);
         quoteButton.setOnClickListener(this);
+        refreshSwitch = (Switch)findViewById(R.id.refreshSwitch);
         refreshButton = findViewById(R.id.button_refresh);
         refreshButton.setOnClickListener(this);
         textView = (AutoCompleteTextView)findViewById(R.id.auto_complete_text_view);
@@ -188,6 +193,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         actionBar.setDisplayShowHomeEnabled(true);
 
         favoritesLock = new ReentrantLock();
+
+        // Spawn background thread to handle refresh every 10 secs (if on)
+        (new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (!Thread.interrupted()) {
+                    try {
+                        // Every 10 seconds check if should refresh
+                        Thread.sleep(10*1000);
+                        if (refreshSwitch.isChecked()) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    refreshFavorites();
+                                }
+                            });
+                        }
+                    } catch (InterruptedException e) {
+                        Log.d(DEBUG_TAG, "InterruptedException in background refresh thread.");
+                    }
+                }
+            }
+        })).start();
     }
 
     @Override
@@ -348,6 +376,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * Refresh the quotes on the favorite list
      */
     private void refreshFavorites() {
+        // Show a spinner while it loads
+        if (progressDialog == null || !progressDialog.isShowing()) {
+            progressDialog = new ProgressDialog(MainActivity.this, R.style.ProgressTheme);
+            progressDialog.setProgressStyle(android.R.style.Widget_ProgressBar_Small);
+            progressDialog.show();
+        }
         Log.d(DEBUG_TAG, "Refreshing Favorites...");
         //TODO spinner animation?
         List<String> favorites = FavoritesManager.getFavorites(this);
@@ -389,6 +423,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         favoritesLock.lock();
         // TODO do I want update to be atomic?
         if (--favoritesUpdateCount == 0) {
+            progressDialog.dismiss();
             adapter.notifyDataSetChanged();
         }
         Log.d(DEBUG_TAG, "Received update. Waiting for " + favoritesUpdateCount);
