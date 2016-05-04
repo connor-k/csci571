@@ -50,9 +50,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private View quoteButton;
     private View refreshButton;
     private AutoCompleteTextView textView;
-    private ArrayList<String> favoriteItemList;
+    private ArrayList<FavoriteItem> favoriteItemList;
     private DynamicListView dynamicListView;
-    private ArrayAdapter<String> adapter;
+    private FavoritesArrayAdapter adapter;
     private Boolean ignoreAutoComplete = false;
     private AsyncTask autoCompleteTask = null;
 
@@ -135,11 +135,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
         dynamicListView = (DynamicListView)findViewById(R.id.dynamiclistview);
-        favoriteItemList = new ArrayList<String>();
-        favoriteItemList.add("test1");
-        favoriteItemList.add("test2");
-        favoriteItemList.add("test3");
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, favoriteItemList);
+        favoriteItemList = new ArrayList<FavoriteItem>();
+        favoriteItemList.add(new FavoriteItem("AAPL", "Apple Inc", "109.99", "+1.02", "609.80 Billion"));
+        favoriteItemList.add(new FavoriteItem("GOOG", "Alphabet Inc", "109.99", "-1.02", "609.80 Billion"));
+        favoriteItemList.add(new FavoriteItem("TSLA", "Tesla Inc", "109.99", "+1.02", "609.80 Billion"));
+        adapter = new FavoritesArrayAdapter(this, R.layout.list_item_favorites, favoriteItemList);
         dynamicListView.setAdapter(adapter);
 
         // Enable swipe to dismiss
@@ -150,18 +150,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     for (final int position : reverseSortedPositions) {
                         AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
                         //TODO real message
-                        alertDialog.setMessage("Want to delete " + "Apple Inc" + " from favorites?");
+                        alertDialog.setMessage("Want to delete " + adapter.getItemName(position) + " from favorites?");
                         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                            Log.d(DEBUG_TAG, "Tried to remove item " + position);
-                            Log.d(DEBUG_TAG, "Value: " + adapter.getItem(position));
-                            favoriteItemList.remove(position);
-                            adapter.notifyDataSetChanged();
+                                Log.d(DEBUG_TAG, "Tried to remove item " + position);
+                                //Log.d(DEBUG_TAG, "Value: " + adapter.getItem(position));
+                                favoriteItemList.remove(position);
+                                adapter.notifyDataSetChanged();
                             }
                         });
                         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                            //Dismiss
+                                //Dismiss
                             }
                         });
                         alertDialog.show();

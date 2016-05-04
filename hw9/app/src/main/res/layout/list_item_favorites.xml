@@ -4,7 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="24dip"
+    android:paddingTop="4dip"
+    android:paddingBottom="4dip"
+    android:layout_marginLeft="24dip"
+    android:layout_marginRight="24dip"
     tools:context="com.connorkerns.csci571_stocks.MainActivity">
 
     <TableRow
@@ -28,25 +31,25 @@
             android:paddingRight="24dip"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="$ 109.99"
-            android:id="@+id/favoritesChange"
+            android:id="@+id/favoritesPrice"
             android:textAlignment="viewEnd"
             android:textColor="@android:color/black"/>
 
         <TextView
-            android:layout_weight="0.22"
+            android:layout_weight="0.23"
             android:layout_width="0dip"
             android:layout_height="match_parent"
-            android:paddingLeft="8dip"
-            android:paddingRight="8dip"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="+0.99%"
+            android:textAlignment="center"
             android:id="@+id/favoritesChangePercent"
             android:textColor="@android:color/black"
             android:background="@android:color/holo_green_light" />
     </TableRow>
     <TableRow
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dip">
 
         <TextView
             android:layout_weight="0.5"

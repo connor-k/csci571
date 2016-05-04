@@ -94,7 +94,10 @@
         <com.nhaarman.listviewanimations.itemmanipulation.DynamicListView
             android:id="@+id/dynamiclistview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:divider="@android:color/transparent"
+            android:paddingLeft="8dip"
+            android:paddingRight="8dip" />
 
     </TableRow>
 </TableLayout>
