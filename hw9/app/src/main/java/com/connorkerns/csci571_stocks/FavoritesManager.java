@@ -16,8 +16,8 @@ public class FavoritesManager {
         // Check that it's not already a favorite, append it
         if (!isFavorite(context, symbol)) {
             String data = PreferenceManager.getDefaultSharedPreferences(context).getString(KEY_FAVORITES, "");
-            data += "," + symbol;
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putString(KEY_FAVORITES, data).commit();
+            data += (!data.isEmpty() ? "," : "") + symbol;
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString(KEY_FAVORITES, data).apply();
             Log.d(DEBUG_TAG, "addFavorite: Set favorites string: " + data);
         }
     }
@@ -28,7 +28,7 @@ public class FavoritesManager {
             List<String> favorites = getFavorites(context);
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < favorites.size(); ++i) {
-                if (favorites.get(i) != symbol) {
+                if (!favorites.get(i).equals(symbol)) {
                     sb.append(favorites.get(i)).append(",");
                 }
             }
@@ -36,8 +36,10 @@ public class FavoritesManager {
             if (sb.length() > 0 && sb.charAt(sb.length() - 1) == ',') {
                 sb = new StringBuilder(sb.substring(0, sb.length() - 1));
             }
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putString(KEY_FAVORITES, sb.toString()).commit();
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString(KEY_FAVORITES, sb.toString()).apply();
             Log.d(DEBUG_TAG, "removeFavorite: Set favorites string: " + sb.toString());
+        } else {
+            Log.d(DEBUG_TAG, "removeFavorite: symbol not in list, can't remove");
         }
     }
 

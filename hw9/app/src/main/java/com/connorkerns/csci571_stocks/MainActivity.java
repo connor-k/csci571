@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     public static String SYMBOL = "symbol";
@@ -169,21 +170,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
         );
-/*
-        //ArrayLi myAdapter = new MyAdapter();
-        SimpleSwipeUndoAdapter swipeUndoAdapter = new SimpleSwipeUndoAdapter(adapter, MainActivity.this,
-            new OnDismissCallback() {
-                @Override
-                public void onDismiss(@NonNull final ViewGroup listView, @NonNull final int[] reverseSortedPositions) {
-                    for (int position : reverseSortedPositions) {
-                        adapter.remove(adapter.getItem(position));
-                    }
-                }
-            }
-        );
-        swipeUndoAdapter.setAbsListView(dynamicListView);
-        dynamicListView.setAdapter(swipeUndoAdapter);
-        dynamicListView.enableSimpleSwipeUndo();*/
 
         // Add app icon to status bar
         ActionBar actionBar = getSupportActionBar();
@@ -335,11 +321,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * If it's a valid search, get the quote
      */
     private void getQuote() {
-        //TODO change back after debug
-        String input = "AAPL";//textView.getText().toString().trim();
+        String input = textView.getText().toString().trim();
         Log.d(DEBUG_TAG, "Get Quote clicked, input=" + input);
         // Check for blank input
-        if (false && input.isEmpty()) {
+        if (input.isEmpty()) {
             makeAlert("Please enter a Stock Name/Symbol");
         } else {
             String url = "https://inspired-photon-127022.appspot.com/stock-api.php?symbol=" + input;
@@ -352,7 +337,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void refreshFavorites() {
         Log.d(DEBUG_TAG, "Refreshing Favorites...");
-        //TODO
+        //TODO spinner animation?
+        List<String> favorites = FavoritesManager.getFavorites(this);
+        // Refresh data for all favorites
+        favoriteItemList.clear();
+        for (int i = 0; i < favorites.size(); ++i) {
+            if (!favoriteItemList.contains(favorites.get(i))) {
+                FavoriteItem fi = new FavoriteItem(favorites.get(i));
+                favoriteItemList.add(fi);
+                // Asynchronously do the lookup
+                new FavoriteRefresher(this, fi);
+            } else {
+                favoriteItemList.remove(i);
+                --i;
+            }
+        }
+    }
+
+    public void notifyFavoritesChanged() {
+        adapter.notifyDataSetChanged();
     }
 
     /**

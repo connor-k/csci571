@@ -16,6 +16,14 @@ class FavoriteItem {
     String changePercent;
     String marketCap;
     FavoriteItem(String s, String n, String p, String cp, String m) {
+       setAllData(s, n, p, cp, m);
+    }
+
+    FavoriteItem(String s) {
+        setAllData(s, "", "", "", "");
+    }
+
+    public void setAllData(String s, String n, String p, String cp, String m) {
         symbol = s;
         name = n;
         price = p;
@@ -66,10 +74,12 @@ class FavoritesArrayAdapter extends ArrayAdapter<FavoriteItem> {
             }
             if (changePercentText != null) {
                 changePercentText.setText(i.changePercent + "%");
-                if (Double.parseDouble(i.changePercent) > 0.0) {
-                    changePercentText.setBackgroundColor(getContext().getResources().getColor(android.R.color.holo_green_light));
-                } else {
-                    changePercentText.setBackgroundColor(getContext().getResources().getColor(android.R.color.holo_red_light));
+                if (!i.changePercent.isEmpty()) {
+                    if (Double.parseDouble(i.changePercent) > 0.0) {
+                        changePercentText.setBackgroundColor(getContext().getResources().getColor(android.R.color.holo_green_light));
+                    } else {
+                        changePercentText.setBackgroundColor(getContext().getResources().getColor(android.R.color.holo_red_light));
+                    }
                 }
             }
             if (marketCapText != null) {
