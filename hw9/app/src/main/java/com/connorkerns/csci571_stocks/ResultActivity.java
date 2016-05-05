@@ -46,6 +46,10 @@ import com.google.gson.JsonParser;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
@@ -478,7 +482,20 @@ public class ResultActivity extends AppCompatActivity {
                         String content = gson.fromJson(newsItem.get("Description"), String.class);
                         String publisher = gson.fromJson(newsItem.get("Source"), String.class);
                         String date = gson.fromJson(newsItem.get("Date"), String.class);
-                        NewsFragment.instance.addDetailItem(url, title, content, publisher, date);
+                        String oldFormat = "yyyy-MM-dd HH:mm:ss";
+                        String newFormat = "dd MMM yyyy hh:mm:ss";
+                        String time = date.replace('T', ' ').replace('Z', ' ');
+                        String newTime = date;
+                        DateFormat formatter = new SimpleDateFormat(oldFormat);
+                        Date d = null;
+                        try {
+                            d = formatter.parse(time);
+                            ((SimpleDateFormat) formatter).applyPattern(newFormat);
+                            newTime = formatter.format(d);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        NewsFragment.instance.addDetailItem(url, title, content, publisher, newTime);
                         if (i != results.size() - 1) {
                             NewsFragment.instance.addDivider();
                         }
