@@ -12,6 +12,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -43,6 +44,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -203,28 +205,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         favoritesLock = new ReentrantLock();
 
-        // Spawn background thread to handle refresh every 10 secs (if on)
-        (new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        // Every 10 seconds check if should refresh
-                        Thread.sleep(10*1000);
-                        if (MainActivity.autorefresh) {
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    refreshFavorites();
-                                }
-                            });
+        // Use a handler to check autorefresh every 10 seconds
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable(){
+            public void run(){
+                if (MainActivity.autorefresh) {
+                    Log.d(DEBUG_TAG, "Running an autorefresh...");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            refreshFavorites();
                         }
-                    } catch (InterruptedException e) {
-                        Log.d(DEBUG_TAG, "InterruptedException in background refresh thread.");
-                    }
+                    });
                 }
+                handler.postDelayed(this, TimeUnit.SECONDS.toMillis(10));
             }
-        })).start();
+        }, TimeUnit.SECONDS.toMillis(10));
     }
 
     @Override
