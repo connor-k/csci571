@@ -65,19 +65,19 @@ public class ResultActivity extends AppCompatActivity {
             Log.d(DEBUG_TAG, "Facebook Dialog Callback SUCCESS");
             Log.d(DEBUG_TAG, "Post id: " + result.getPostId());
             // Display a toast with not posted if that's the case
-            if (result.getPostId() == null) {
-                Toast.makeText(ResultActivity.this, "Post NOT shared", Toast.LENGTH_SHORT).show();
-            }
+            Toast.makeText(ResultActivity.this, "You shared this post.", Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onCancel() {
             Log.d(DEBUG_TAG, "Facebook Dialog Callback CANCEL");
+            Toast.makeText(ResultActivity.this, "Post NOT shared", Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onError(FacebookException error) {
             Log.d(DEBUG_TAG, "Facebook Dialog Callback ERROR");
+            Toast.makeText(ResultActivity.this, "Post NOT shared", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -175,31 +175,28 @@ public class ResultActivity extends AppCompatActivity {
             } else {
                 FavoritesManager.addFavorite(ResultActivity.this, ResultActivity.symbol);
                 // Toast at 1:23
-                Toast.makeText(ResultActivity.this, "Bookmarked " + ResultActivity.name + "!!", Toast.LENGTH_SHORT);
+                Toast.makeText(ResultActivity.this, "Bookmarked " + ResultActivity.name + "!!", Toast.LENGTH_SHORT).show();
             }
             setFavoriteIcon();
             return true;
         } else if (id == R.id.action_facebook) {
             Log.d(DEBUG_TAG, "Facebook share button clicked");
             // Toast at 1:27
-            Toast.makeText(ResultActivity.this, "Sharing " + ResultActivity.name + "!!", Toast.LENGTH_SHORT);
-            //TODO
+            Toast.makeText(ResultActivity.this, "Sharing " + ResultActivity.name + "!!", Toast.LENGTH_SHORT).show();
             shareDialog = new ShareDialog(this);
             shareDialog.registerCallback(callbackManager, shareCallback);
-            //TODO not quite right -- remove quote and change the url caption to be the current quote
             if (ShareDialog.canShow(ShareLinkContent.class)) {
                 ShareLinkContent linkContent = new ShareLinkContent.Builder()
                         .setContentTitle("Current Stock Price of " + ResultActivity.name + " is $"
                                 + ResultActivity.lastPrice)
-                        .setQuote("Stock Information of " + ResultActivity.name + " ("
+                        .setContentDescription("Stock Information of " + ResultActivity.name + " ("
                                 + ResultActivity.symbol + ")")
-                        .setContentDescription("Last Traded Price: $ " + ResultActivity.lastPrice
-                                + ", Change: " + ResultActivity.changeStr)
                         .setImageUrl(Uri.parse("https://chart.yahoo.com/t?s=" + ResultActivity.symbol
                                 + "&lang=en-US&width=400&height=300"))
                         .setContentUrl(Uri.parse("https://finance.yahoo.com/q?s=" + symbol))
                         .build();
-                shareDialog.show(linkContent);
+                shareDialog.setShouldFailOnDataError(true);
+                shareDialog.show(linkContent, ShareDialog.Mode.FEED);
             }
             return true;
         }
@@ -285,7 +282,9 @@ public class ResultActivity extends AppCompatActivity {
             addDetailItem(details, "Change", display, inflater, container, positive);
             addDivider(details, inflater, container);
 
-            addDetailItem(details, "TIMESTAMP", gson.fromJson(quote.get("Timestamp"), String.class), inflater, container);
+            String timestamp = gson.fromJson(quote.get("Timestamp"), String.class);
+            timestamp = timestamp.substring(0, timestamp.length() - 3);
+            addDetailItem(details, "TIMESTAMP", timestamp, inflater, container);
             addDivider(details, inflater, container);
 
             addDetailItem(details, "MARKETCAP", gson.fromJson(quote.get("MarketCap"), String.class), inflater, container);
@@ -443,8 +442,7 @@ public class ResultActivity extends AppCompatActivity {
             NewsFragment.container = container;
             String url = "https://inspired-photon-127022.appspot.com/stock-api.php?news="
                     + ResultActivity.symbol;
-            //TODO uncomment later, for now comment to reduce queries
-            //new NewsRequestTask().execute(url);
+            new NewsRequestTask().execute(url);
 
             return rootView;
         }

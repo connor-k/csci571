@@ -166,7 +166,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 public void onDismiss(@NonNull final ViewGroup listView, @NonNull final int[] reverseSortedPositions) {
                     for (final int position : reverseSortedPositions) {
                         AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                        //TODO real message
                         alertDialog.setMessage("Want to delete " + adapter.getItemName(position) + " from favorites?");
                         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
@@ -429,7 +428,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void notifyFavoritesChanged() {
         // 1:43 updates look atomic and on going back all are reloaded!
         favoritesLock.lock();
-        // TODO do I want update to be atomic?
         if (--favoritesUpdateCount == 0) {
             progressDialog.dismiss();
             adapter.notifyDataSetChanged();
