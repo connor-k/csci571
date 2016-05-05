@@ -299,10 +299,10 @@ public class ResultActivity extends AppCompatActivity {
             addDivider(details, inflater, container);
 
             value = gson.fromJson(quote.get("ChangeYTD"), Double.class);
-            positive = value > 0.0;
             display = String.format("%.2f", value);
             value = gson.fromJson(quote.get("ChangePercentYTD"), Double.class);
-            display += "(" + String.format("%.2f", value) + "%)";
+            positive = value > 0.0;
+            display += "(" + (positive ? "+" : "") + String.format("%.2f", value) + "%)";
             addDetailItem(details, "CHANGEYTD", display, inflater, container, positive);
             addDivider(details, inflater, container);
 

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://code.jquery.com/jquery.min.js"></script>
+  <script src="https://code.highcharts.com/stock/highstock.js"></script>
+  <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+</head>
+<body>
+  <div id="chart-container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+  <script>
+    var symbol = "AAPL";
+    function chartFixDate(dateIn) {
+      var dat = new Date(dateIn);
+      return Date.UTC(dat.getFullYear(), dat.getMonth(), dat.getDate());
+    };
+
+    function chartGetOHLC(json) {
+      var dates = json.Dates || [];
+      var elements = json.Elements || [];
+      var chartSeries = [];
+
+      if (elements[0]) {
+        for (var i = 0, datLen = dates.length; i < datLen; i++) {
+          var dat = chartFixDate(dates[i]);
+          var pointData = [
+            dat,
+            elements[0].DataSeries['open'].values[i],
+            elements[0].DataSeries['high'].values[i],
+            elements[0].DataSeries['low'].values[i],
+            elements[0].DataSeries['close'].values[i]
+          ];
+          chartSeries.push(pointData);
+        };
+      }
+      return chartSeries;
+    };
+
+    // Chart data
+    $.ajax({
+        url: "https://inspired-photon-127022.appspot.com/stock-api.php",
+        data: {chart: symbol},
+        success: function(data) {
+          try {
+            d = data;
+            js_data = JSON.parse(data);
+            $('#chart-container').highcharts('StockChart', {
+              rangeSelector : {
+                buttons: [
+                  {type: 'week',
+                    count: 1,
+                    text: '1w'
+                  }, {
+                    type: 'month',
+                    count: 1,
+                    text: '1m'
+                  }, {
+                    type: 'month',
+                    count: 3,
+                    text: '3m'
+                  }, {
+                    type: 'month',
+                    count: 6,
+                    text: '6m'
+                  }, {
+                    type: 'ytd',
+                    text: 'YTD'
+                  }, {
+                    type: 'year',
+                    count: 1,
+                    text: '1y'
+                  }, {
+                    type: 'all',
+                    text: 'All'
+                }],
+                selected : 0,
+                inputEnabled : false
+              },
+
+              title : {
+                text : symbol + ' Stock Value'
+              },
+
+              navigation : {
+                buttonOptions : {
+                  enabled: false
+                }
+              },
+
+              yAxis : {
+                title : {
+                  text: "Stock Value"
+                }
+              },
+
+              series : [{
+                name : symbol + ': $',
+                data : chartGetOHLC(js_data),
+                type : 'area',
+                threshold : null,
+                tooltip : {
+                  valueDecimals : 2,
+                  valuePrefix : '$'
+                },
+                fillColor : {
+                  linearGradient : {
+                    x1: 0,
+                    y1: 0,
+                    x2: 0,
+                    y2: 1
+                  },
+                  stops : [
+                    [0, Highcharts.getOptions().colors[0]],
+                    [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                  ]
+                }
+              }]
+            });
+          } catch (e) {
+            console.log('Note: Markit on Demand queries exceeded, please wait and try again.');
+            return false;
+          }
+        },
+      });
+  </script>
+</html>
