@@ -455,9 +455,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-        // Restart the autorefresh handler in case it's a new context
+        // Restart the autorefresh handler in case it's a the new context
         handler.removeCallbacks(autorefreshTask);
         handler.postDelayed(autorefreshTask, TimeUnit.SECONDS.toMillis(10));
         refreshFavorites();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        handler.removeCallbacks(autorefreshTask);
     }
 }
