@@ -44,11 +44,20 @@ public class FavoriteRefresher {
                 Gson gson = new Gson();
                 JsonParser parser = new JsonParser();
                 JsonObject quote = parser.parse(result).getAsJsonObject();
-                String name = gson.fromJson(quote.get("Name"), String.class);
                 String price = gson.fromJson(quote.get("LastPrice"), String.class);
                 String changePercent = gson.fromJson(quote.get("ChangePercent"), String.class);
-                String marketCap = gson.fromJson(quote.get("MarketCap"), String.class);
-                favoriteItem.setAllData(favoriteItem.symbol, name, price, changePercent, marketCap);
+                // Always update price/change percent
+                favoriteItem.price = price;
+                favoriteItem.changePercent = changePercent;
+                // Only update price/change if this isn't the first quote request
+                if (favoriteItem.isInitialUpdate) {
+                    String name = gson.fromJson(quote.get("Name"), String.class);
+                    String marketCap = gson.fromJson(quote.get("MarketCap"), String.class);
+                    favoriteItem.name = name;
+                    favoriteItem.marketCap = marketCap;
+                    favoriteItem.isInitialUpdate = false;
+                    favoriteItem.initialized = true;
+                }
             } catch (JsonParseException e) {
                 Log.d(DEBUG_TAG, "Quote request had no results");
             } catch (IllegalStateException e) {

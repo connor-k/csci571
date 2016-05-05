@@ -16,13 +16,16 @@ class FavoriteItem {
     String changePercent;
     String marketCap;
     boolean initialized;
+    boolean isInitialUpdate;
     FavoriteItem(String s, String n, String p, String cp, String m) {
-       setAllData(s, n, p, cp, m);
+        setAllData(s, n, p, cp, m);
+        isInitialUpdate = true;
     }
 
     FavoriteItem(String s) {
         setAllData(s, "", "", "", "");
         initialized = false;
+        isInitialUpdate = true;
     }
 
     public void setAllData(String s, String n, String p, String cp, String m) {
@@ -63,9 +66,11 @@ class FavoritesArrayAdapter extends ArrayAdapter<FavoriteItem> {
         if (i != null && i.initialized) {
             TextView symbolText = (TextView)v.findViewById(R.id.favoritesSymbol);
             TextView nameText = (TextView)v.findViewById(R.id.favoritesName);
+            TextView marketCapLabel = (TextView)v.findViewById(R.id.favoritesMarketCapLabel);
+            TextView marketCapText = (TextView)v.findViewById(R.id.favoritesMarketCap);
             TextView priceText = (TextView)v.findViewById(R.id.favoritesPrice);
             TextView changePercentText = (TextView)v.findViewById(R.id.favoritesChangePercent);
-            TextView marketCapText = (TextView)v.findViewById(R.id.favoritesMarketCap);
+
             if (symbolText != null) {
                 symbolText.setText(i.symbol);
             }
@@ -85,6 +90,9 @@ class FavoritesArrayAdapter extends ArrayAdapter<FavoriteItem> {
                         changePercentText.setBackgroundColor(getContext().getResources().getColor(android.R.color.holo_red_light));
                     }
                 }
+            }
+            if (marketCapLabel != null) {
+                marketCapLabel.setVisibility(View.VISIBLE);
             }
             if (marketCapText != null) {
                 marketCapText.setText(i.marketCap);
