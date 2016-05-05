@@ -47,8 +47,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    public static String SYMBOL = "symbol";
-    public static String NAME = "name";
     public static String QUOTE_JSON = "quote_json";
 
     private static String DEBUG_TAG = "MainActivity";
@@ -133,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> p, View v, int pos, long id) {
-                //TODO this is a little sketch
                 String item = p.getItemAtPosition(pos).toString();
                 String ticker = item.substring(0, item.indexOf(' '));
                 Log.d(DEBUG_TAG, "Clicked on list item=" + ticker);
@@ -211,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 while (true) {
                     try {
                         // Every 10 seconds check if should refresh
-                        Thread.sleep(2*1000);
+                        Thread.sleep(10*1000);
                         if (MainActivity.autorefresh) {
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -250,6 +247,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void clearTextView() {
         textView.setText("");
+        // Also clear autocomplete results
+        textView.setAdapter(null);
     }
 
     /**
@@ -328,9 +327,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (gson.fromJson(quote.get("Status"), String.class).equals("SUCCESS")) {
                     Log.d(DEBUG_TAG, "Status was success, starting result activity.");
                     Intent intent = new Intent(MainActivity.this, ResultActivity.class);
-                    intent.putExtra(MainActivity.NAME, "TODO parse in result side");
                     intent.putExtra(MainActivity.QUOTE_JSON, result);
                     startActivity(intent);
+                } else if (gson.fromJson(quote.get("Status"), String.class).contains("Failure")) {
+                    Log.d(DEBUG_TAG, "Status was Failure, can't start result activity.");
+                    makeAlert("No Result for Symbol");
                 } else {
                     Log.d(DEBUG_TAG, "Status was NOT success, can't start result activity.");
                     makeAlert("Invalid Symbol");
@@ -393,7 +394,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             progressDialog.show();
         }
         Log.d(DEBUG_TAG, "Refreshing Favorites...");
-        //TODO spinner animation?
         List<String> favorites = FavoritesManager.getFavorites(this);
         // Refresh data for all favorites
         favoritesLock.lock();

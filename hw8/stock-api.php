@@ -63,6 +63,8 @@
             $json_root->{'Open'} = number_format(round($json_root->{'Open'}, 2), 2, '.', '');
             $response = json_encode($json_root, JSON_PRETTY_PRINT);
             printf("%s", $response);
+        } else if ($json_root != null && strpos($json_root->{'Status'}, 'Failure') !== false) {
+            printf("%s", $query_response);
         }
     } else if (isset($_GET[ACTION_NEWS])) {
         $key = '9BuSpXwlNTHIMM5KOAo9RyhoJBmV/hFOKwRnHvcRSnU';

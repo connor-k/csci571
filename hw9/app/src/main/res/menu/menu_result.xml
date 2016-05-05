@@ -14,5 +14,4 @@
         android:title="@string/action_favorite"
         android:icon="@drawable/fb"
         app:showAsAction="always" />
-    <!-- TODO facebook icon -->
 </menu>

@@ -108,7 +108,6 @@ public class ResultActivity extends AppCompatActivity {
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        //TODO may need to disallow swiping between tabs (see Piazza)
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -481,7 +480,6 @@ public class ResultActivity extends AppCompatActivity {
                         String content = gson.fromJson(newsItem.get("Description"), String.class);
                         String publisher = gson.fromJson(newsItem.get("Source"), String.class);
                         String date = gson.fromJson(newsItem.get("Date"), String.class);
-                        //TODO convert date?
                         NewsFragment.instance.addDetailItem(url, title, content, publisher, date);
                         if (i != results.size() - 1) {
                             NewsFragment.instance.addDivider();
