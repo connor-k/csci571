@@ -146,7 +146,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         textView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                textView.showDropDown();
+                if (textView.getText().toString().length() >= 3) {
+                    textView.showDropDown();
+                }
                 return false;
             }
         });
