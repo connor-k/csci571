@@ -66,6 +66,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int favoritesUpdateCount = 0;
     private ProgressDialog progressDialog;
     private static boolean autorefresh;
+    private final Handler handler = new Handler();
+    private Runnable autorefreshTask = new Runnable() {
+        public void run(){
+            if (MainActivity.autorefresh) {
+                Log.d(DEBUG_TAG, "Running an autorefresh...");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        refreshFavorites();
+                    }
+                });
+            }
+            handler.postDelayed(this, TimeUnit.SECONDS.toMillis(10));
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -205,21 +220,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         favoritesLock = new ReentrantLock();
 
         // Use a handler to check autorefresh every 10 seconds
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable(){
-            public void run(){
-                if (MainActivity.autorefresh) {
-                    Log.d(DEBUG_TAG, "Running an autorefresh...");
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            refreshFavorites();
-                        }
-                    });
-                }
-                handler.postDelayed(this, TimeUnit.SECONDS.toMillis(10));
-            }
-        }, TimeUnit.SECONDS.toMillis(10));
+        handler.postDelayed(autorefreshTask, TimeUnit.SECONDS.toMillis(10));
     }
 
     @Override
@@ -454,6 +455,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
+        // Restart the autorefresh handler in case it's a new context
+        handler.removeCallbacks(autorefreshTask);
+        handler.postDelayed(autorefreshTask, TimeUnit.SECONDS.toMillis(10));
         refreshFavorites();
     }
 }

@@ -287,7 +287,6 @@ public class ResultActivity extends AppCompatActivity {
             addDivider(details, inflater, container);
 
             String timestamp = gson.fromJson(quote.get("Timestamp"), String.class);
-            timestamp = timestamp.substring(0, timestamp.length() - 3);
             addDetailItem(details, "TIMESTAMP", timestamp, inflater, container);
             addDivider(details, inflater, container);
 
@@ -480,7 +479,7 @@ public class ResultActivity extends AppCompatActivity {
                         String url = gson.fromJson(newsItem.get("Url"), String.class);
                         String title = gson.fromJson(newsItem.get("Title"), String.class);
                         String content = gson.fromJson(newsItem.get("Description"), String.class);
-                        String publisher = gson.fromJson(newsItem.get("Source"), String.class);
+                        String publisher = "Publisher : " + gson.fromJson(newsItem.get(" Source "), String.class);
                         String date = gson.fromJson(newsItem.get("Date"), String.class);
                         String oldFormat = "yyyy-MM-dd HH:mm:ss";
                         String newFormat = "dd MMM yyyy hh:mm:ss";
@@ -495,6 +494,7 @@ public class ResultActivity extends AppCompatActivity {
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
+                        newTime = "Date : " + newTime;
                         NewsFragment.instance.addDetailItem(url, title, content, publisher, newTime);
                         if (i != results.size() - 1) {
                             NewsFragment.instance.addDivider();
