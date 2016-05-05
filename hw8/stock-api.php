@@ -37,7 +37,7 @@
             $json_root->{'LastPrice'} = number_format(round($json_root->{'LastPrice'}, 2), 2, '.', '');
             $json_root->{'Change'} = number_format(round($json_root->{'Change'}, 2), 2, '.', '');
             $json_root->{'ChangePercent'} = number_format(round($json_root->{'ChangePercent'}, 2), 2, '.', '');
-            $display_format = 'd F Y, H:i:s a';
+            $display_format = 'd F Y, H:i:s';
             date_default_timezone_set("America/Los_Angeles");
             $json_root->{'Timestamp'} = date($display_format, strtotime($json_root->{'Timestamp'}));
             $market_cap_unit = "Billion";
