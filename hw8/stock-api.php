@@ -56,7 +56,7 @@
             }
 
             $json_root->{'MarketCap'} = $market_cap." ".$market_cap_unit;
-            $json_root->{'ChangeYTD'} = number_format(round($json_root->{'ChangeYTD'}, 2), 2, '.', '');
+            $json_root->{'ChangeYTD'} = number_format(round($json_root->{'LastPrice'} - $json_root->{'ChangeYTD'}, 2), 2, '.', '');
             $json_root->{'ChangePercentYTD'} = number_format(round($json_root->{'ChangePercentYTD'}, 2), 2, '.', '');
             $json_root->{'High'} = number_format(round($json_root->{'High'}, 2), 2, '.', '');
             $json_root->{'Low'} = number_format(round($json_root->{'Low'}, 2), 2, '.', '');
